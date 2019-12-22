@@ -5,7 +5,11 @@ import {createTripSortTemplate} from './components/sort.js';
 import {createAddTripEventsTemplate} from './components/add-events.js';
 import {createEditTripEventsTemplate} from './components/edit-events.js';
 import {createTripEventListTemplate} from './components/event-list.js';
-import {createTripEventsItem} from './components/events-item.js';
+import {createTripEventsTemplate} from './components/events-item.js';
+import {generateCards} from './mock/mock.js';
+import {sortOptions} from './mock/mock.js';
+import {filters} from './mock/mock.js';
+import {Cities} from './mock/mock.js';
 
 const TRIP_COUNT = 3;
 
@@ -16,24 +20,23 @@ const render = (container, template, place = `beforeEnd`) => {
 const tripMain = document.querySelector(`.trip-main`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
 
-render(tripInfo, createTripInfoTemplate(), `afterBegin`);
+render(tripInfo, createTripInfoTemplate(Cities), `afterBegin`);
 
 const tripControls = tripMain.querySelector(`.trip-controls`);
 const tripControlsMenu = tripControls.querySelector(`h2:nth-of-type(1)`);
 const tripControlsFilters = tripControls.querySelector(`h2:nth-of-type(2)`);
 
 render(tripControlsMenu, createTripControlsTemplate(), `afterEnd`);
-render(tripControlsFilters, createTripFiltersTemplate(), `afterEnd`);
+render(tripControlsFilters, createTripFiltersTemplate(filters), `afterEnd`);
 
-const tripEvets = document.querySelector(`.trip-events`);
+const tripEvents = document.querySelector(`.trip-events`);
+render(tripEvents, createTripSortTemplate(sortOptions));
+render(tripEvents, createAddTripEventsTemplate());
+render(tripEvents, createEditTripEventsTemplate());
+render(tripEvents, createTripEventListTemplate());
 
-render(tripEvets, createTripSortTemplate());
-render(tripEvets, createAddTripEventsTemplate());
-render(tripEvets, createEditTripEventsTemplate());
-render(tripEvets, createTripEventListTemplate());
-
-const tripEventList = tripEvets.querySelector(`.trip-events__list`);
-
-for (let i = 0; i < TRIP_COUNT; i++) {
-  render(tripEventList, createTripEventsItem());
-}
+const tripEventList = tripEvents.querySelector(`.trip-events__list`);
+const cards = generateCards(TRIP_COUNT);
+cards.slice(0).forEach((task) => {
+  render(tripEventList, createTripEventsTemplate(task));
+});
