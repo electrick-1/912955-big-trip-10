@@ -1,51 +1,23 @@
-import {MONTH_NAMES} from '../const.js';
-import {getRandomIntegerNumber} from '../utils.js';
-import {getRandomArrayItem} from '../utils.js';
+const getDuration = (startDateUTCTimestamp, endDateUTCTimestamp) => {
+  const startDate = new Date(startDateUTCTimestamp);
+  const monthName = startDate.toLocaleString(`en-US`, {
+    month: `short`
+  });
+  const startDay = startDate.getDate();
+  const endDay = new Date(endDateUTCTimestamp).getDate();
 
-const FIRST_MONTH_DAY = 1;
-
-const getTripRoute = (tripRoute) => {
-  if (tripRoute.length <= 3) {
-    return (
-      `${tripRoute[0]} &mdash;
-      ${tripRoute[1]} &mdash;
-      ${tripRoute[2]}`
-    );
-  } else {
-    return (
-      `${tripRoute[0]} &mdash;
-      ... &mdash; ${tripRoute[tripRoute.length - 1]}`
-    );
-  }
+  return (`${monthName} ${startDay}&nbsp;&mdash;&nbsp;${endDay}`);
 };
 
-const getTripDate = () => {
-  const month = getRandomArrayItem(MONTH_NAMES);
-  const lastMonthDay = () => {
-    let lastDay = 0;
-    if (month === `Apr` || `Jun` || `Sep` || `Nov`) {
-      lastDay = 30;
-    } else if (month === `Feb`) {
-      lastDay = 28;
-    } else {
-      lastDay = 31;
-    }
-    return lastDay;
-  };
-
-  const startDate = getRandomIntegerNumber(FIRST_MONTH_DAY, lastMonthDay());
-  const endDate = getRandomIntegerNumber(startDate, lastMonthDay());
-  return (`${month} ${startDate} &mdash; ${endDate}`);
-};
-
-export const createTripInfoTemplate = (tripRoute) => {
+export const getTripInfo = (cards) => {
   return (`
     <div class="trip-info__main">
       <h1 class="trip-info__title">
-        ${getTripRoute(tripRoute)}
+        ${cards[0].city}
+        ${cards.length > 2 ? `&mdash; ... &mdash;` : `&mdash;`}
+        ${cards[cards.length - 1].city}
       </h1>
-
-      <p class="trip-info__dates">${getTripDate()}</p>
+      <p class="trip-info__dates">${getDuration(cards[0].startDate, cards[cards.length - 1].endDate)}</p>
     </div>
   `);
 };

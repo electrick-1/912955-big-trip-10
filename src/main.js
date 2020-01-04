@@ -1,42 +1,48 @@
-import {createTripInfoTemplate} from './components/info.js';
-import {createTripControlsTemplate} from './components/controls.js';
-import {createTripFiltersTemplate} from './components/filters.js';
-import {createTripSortTemplate} from './components/sort.js';
-import {createAddTripEventsTemplate} from './components/add-events.js';
-import {createEditTripEventsTemplate} from './components/edit-events.js';
-import {createTripEventListTemplate} from './components/event-list.js';
-import {createTripEventsTemplate} from './components/events-item.js';
-import {generateCards} from './mock/mock.js';
-import {sortOptions} from './mock/mock.js';
-import {filters} from './mock/mock.js';
-import {Cities} from './mock/mock.js';
+import {render} from './utils.js';
+import {getTripInfo} from './components/info.js';
+import {getControls} from './components/controls.js';
+import {getFilters} from './components/filters.js';
+import {getSort} from './components/sort.js';
+import {getEditEvents} from './components/edit-event.js';
+import {createEventsContainer} from './components/event-list.js';
+import {getEvents} from './components/event-item.js';
+import {createDay} from './components/day.js';
+import {cards} from './mock/events.js';
+import {sortOptions} from './mock/sort.js';
+import {filters} from './mock/filters.js';
 
-const TRIP_COUNT = 3;
-
-const render = (container, template, place = `beforeEnd`) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
 
-render(tripInfo, createTripInfoTemplate(Cities), `afterBegin`);
+render(tripInfo, getTripInfo(cards), `afterBegin`);
 
 const tripControls = tripMain.querySelector(`.trip-controls`);
-const tripControlsMenu = tripControls.querySelector(`h2:nth-of-type(1)`);
-const tripControlsFilters = tripControls.querySelector(`h2:nth-of-type(2)`);
 
-render(tripControlsMenu, createTripControlsTemplate(), `afterEnd`);
-render(tripControlsFilters, createTripFiltersTemplate(filters), `afterEnd`);
+render(tripControls, getControls());
+render(tripControls, getFilters(filters));
 
 const tripEvents = document.querySelector(`.trip-events`);
-render(tripEvents, createTripSortTemplate(sortOptions));
-render(tripEvents, createAddTripEventsTemplate());
-render(tripEvents, createEditTripEventsTemplate());
-render(tripEvents, createTripEventListTemplate());
+render(tripEvents, getSort(sortOptions));
+render(tripEvents, createEventsContainer());
 
-const tripEventList = tripEvents.querySelector(`.trip-events__list`);
-const cards = generateCards(TRIP_COUNT);
-cards.slice(0).forEach((task) => {
-  render(tripEventList, createTripEventsTemplate(task));
+const tripDays = document.querySelector(`.trip-days`);
+const dates = [
+  ...new Set(cards.map((card) => new Date(card.startDate).toDateString()))
+];
+
+dates.forEach((day, index) => {
+  render(tripDays, createDay(day, index));
+  const dayContainer = tripDays.querySelector(`.trip-days__item:last-of-type`);
+  cards.filter((event) => day === new Date(event.startDate).toDateString())
+    .forEach((event, i) => {
+      const eventList = dayContainer.querySelector(`.trip-events__list`);
+      if (index === 0 && i === 0) {
+        render(eventList, getEditEvents(event));
+      } else {
+        render(eventList, getEvents(event));
+      }
+    }
+
+    );
 });

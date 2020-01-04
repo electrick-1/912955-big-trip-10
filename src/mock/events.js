@@ -47,7 +47,7 @@ const Descriptions = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const Options = [
+const Offers = [
   {
     type: `luggage`,
     name: `Add luggage`,
@@ -73,14 +73,6 @@ const Options = [
   }
 ];
 
-const generateType = () => {
-  return getRandomArrayItem(Types);
-};
-
-const generateCity = () => {
-  return getRandomArrayItem(Cities);
-};
-
 const generatePhotos = () => {
   let photos = [];
 
@@ -88,11 +80,6 @@ const generatePhotos = () => {
     photos.push(`http://picsum.photos/300/150?r=${Math.random()}`);
   }
   return photos;
-};
-
-const generateDescription = () => {
-  return Descriptions
-  .slice(0, getRandomIntegerNumber(1, 3)).join(` `);
 };
 
 const getRandomInterval = () => {
@@ -113,24 +100,25 @@ const generateEndDate = () => {
   );
 };
 
-const generateOptions = () => {
+const generateOffers = () => {
   let options = [];
 
   for (let i = 0; i < getRandomIntegerNumber(0, 2); i++) {
-    options.push(getRandomArrayItem(Options));
+    options.push(getRandomArrayItem(Offers));
   }
   return options;
 };
 
 const generateCard = () => {
   return {
-    type: generateType(),
-    city: generateCity(),
+    type: getRandomArrayItem(Types),
+    city: getRandomArrayItem(Cities),
     photos: generatePhotos(),
-    description: generateDescription(),
+    description: Descriptions.slice(0, getRandomIntegerNumber(1, 3)).join(` `),
     startDate: generateStartDate(),
     endDate: generateEndDate(),
-    options: generateOptions()
+    offers: generateOffers(),
+    price: getRandomIntegerNumber(50, 150)
   };
 };
 
@@ -138,13 +126,12 @@ const generateCard = () => {
 const generateCards = (count) => {
   return new Array(count)
   .fill(``)
-  .map(generateCard);
+  .map(generateCard)
+  .sort((prev, next) => prev.startDate - next.startDate);
 };
 
-const filters = [`everything`, `future`, `past`];
+const cards = generateCards(10);
 
 const menuNames = [`Table`, `Stats`];
 
-const sortOptions = [`event`, `time`, `price`];
-
-export {generateCards, filters, menuNames, sortOptions, Cities};
+export {cards, menuNames};

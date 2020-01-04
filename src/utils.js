@@ -8,4 +8,22 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-export {getRandomIntegerNumber, getRandomArrayItem};
+const render = (container, template, place = `beforeEnd`) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+const parseDate = (UTCTimestamp) => {
+  const date = new Date(UTCTimestamp);
+  return (
+    `${date.getDate()}/${date.getMonth()}/${String(date.getFullYear()).slice(2)}`
+  );
+};
+
+const parseTime = (UTCTimestamp) => {
+  const date = new Date(UTCTimestamp);
+  return (
+    `${date.getHours()}:${date.getMinutes()}`
+  );
+};
+
+export {getRandomIntegerNumber, getRandomArrayItem, render, parseDate, parseTime};
