@@ -1,3 +1,8 @@
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
 const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor((max - min + 1) * Math.random());
 };
@@ -8,8 +13,20 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-const render = (container, template, place = `beforeEnd`) => {
-  container.insertAdjacentHTML(place, template);
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN: container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND: container.append(element);
+      break;
+  }
 };
 
 const parseDate = (UTCTimestamp) => {
@@ -26,4 +43,4 @@ const parseTime = (UTCTimestamp) => {
   );
 };
 
-export {getRandomIntegerNumber, getRandomArrayItem, render, parseDate, parseTime};
+export {RenderPosition, getRandomIntegerNumber, getRandomArrayItem, createElement, render, parseDate, parseTime};

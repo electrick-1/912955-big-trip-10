@@ -1,8 +1,8 @@
-import {parseDate, parseTime} from '../utils';
+import {parseDate, parseTime, createElement} from '../utils';
 
-export const getEditEvents = (card) => {
-  return (`
-    <form class="trip-events__item  event  event--edit" action="#" method="post">
+const getEditEvents = (card) => {
+  return (
+    `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -147,6 +147,29 @@ export const getEditEvents = (card) => {
           </div>
         </section>
       </section>
-    </form>
-  `);
+    </form>`
+  );
 };
+
+export default class EditEvents {
+  constructor(card) {
+    this._element = null;
+    this._card = card;
+  }
+
+  getTemplate() {
+    return getEditEvents(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

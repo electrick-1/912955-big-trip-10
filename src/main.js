@@ -1,12 +1,13 @@
-import {render} from './utils.js';
-import {getTripInfo} from './components/info.js';
-import {getControls} from './components/controls.js';
-import {getFilters} from './components/filters.js';
-import {getSort} from './components/sort.js';
-import {getEditEvents} from './components/edit-event.js';
-import {createEventsContainer} from './components/event-list.js';
-import {getEvents} from './components/event-item.js';
-import {createDay} from './components/day.js';
+import {RenderPosition, render} from './utils.js';
+import TripInfoComponent from './components/info.js';
+import CostComponent from './components/cost.js';
+import ControlsComponent from './components/controls.js';
+import FiltersComponent from './components/filters.js';
+import SortComponent from './components/sort.js';
+import EventsComponent from './components/event-item.js';
+import EditEventsComponent from './components/edit-event.js';
+import EventContainerComponent from './components/event-list.js';
+import DayComponent from './components/day.js';
 import {cards} from './mock/events.js';
 import {sortOptions} from './mock/sort.js';
 import {filters} from './mock/filters.js';
@@ -14,17 +15,15 @@ import {filters} from './mock/filters.js';
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
-
-render(tripInfo, getTripInfo(cards), `afterBegin`);
-
 const tripControls = tripMain.querySelector(`.trip-controls`);
-
-render(tripControls, getControls());
-render(tripControls, getFilters(filters));
-
 const tripEvents = document.querySelector(`.trip-events`);
-render(tripEvents, getSort(sortOptions));
-render(tripEvents, createEventsContainer());
+
+render(tripInfo, new TripInfoComponent(cards).getElement(), RenderPosition.AFTERBEGIN);
+render(tripInfo, new CostComponent(cards).getElement(), RenderPosition.BEFOREEND);
+render(tripControls, new ControlsComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripControls, new FiltersComponent(filters).getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new SortComponent(sortOptions).getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new EventContainerComponent().getElement(), RenderPosition.BEFOREEND);
 
 const tripDays = document.querySelector(`.trip-days`);
 const dates = [
@@ -32,16 +31,39 @@ const dates = [
 ];
 
 dates.forEach((day, index) => {
-  render(tripDays, createDay(day, index));
+  render(tripDays, new DayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
   const dayContainer = tripDays.querySelector(`.trip-days__item:last-of-type`);
   cards.filter((event) => day === new Date(event.startDate).toDateString())
-    .forEach((event, i) => {
+    .forEach((even) => {
       const eventList = dayContainer.querySelector(`.trip-events__list`);
-      if (index === 0 && i === 0) {
-        render(eventList, getEditEvents(event));
-      } else {
-        render(eventList, getEvents(event));
-      }
+
+      const onEscKeyDown = (evt) => {
+        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+        if (isEscKey) {
+          replaceEditToEvent();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
+
+      const replaceEditToEvent = () => {
+        eventList.replaceChild(eventComponent.getElement(), editEventComponent.getElement());
+      };
+
+      const replaceEventToEdit = () => {
+        eventList.replaceChild(editEventComponent.getElement(), eventComponent.getElement());
+      };
+
+      const eventComponent = new EventsComponent(even);
+      const editButton = eventComponent.getElement().querySelector(`.event__rollup-btn`);
+      editButton.addEventListener(`click`, () => {
+        replaceEventToEdit();
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+
+      const editEventComponent = new EditEventsComponent(even);
+      editEventComponent.getElement().addEventListener(`submit`, () => replaceEditToEvent);
+
+      render(eventList, eventComponent.getElement(), RenderPosition.BEFOREEND);
     }
 
     );
