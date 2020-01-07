@@ -1,4 +1,5 @@
-import {parseTime, createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
+import {parseTime} from '../utils/common.js';
 
 const getEvents = (event) => {
   return (
@@ -45,9 +46,10 @@ const getEvents = (event) => {
   );
 };
 
-export default class Events {
+export default class Events extends AbstractComponent {
   constructor(event) {
-    this._element = null;
+    super();
+
     this._event = event;
   }
 
@@ -55,15 +57,7 @@ export default class Events {
     return getEvents(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

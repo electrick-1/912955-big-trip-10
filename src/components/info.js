@@ -1,4 +1,4 @@
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const getDuration = (startDateUTCTimestamp, endDateUTCTimestamp) => {
   const startDate = new Date(startDateUTCTimestamp);
@@ -24,25 +24,14 @@ const getTripInfo = (cards) => {
   );
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractComponent {
   constructor(cards) {
-    this._element = null;
+    super();
+
     this._cards = cards;
   }
 
   getTemplate() {
     return getTripInfo(this._cards);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
