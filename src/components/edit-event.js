@@ -1,4 +1,5 @@
-import {parseDate, parseTime, createElement} from '../utils';
+import AbstractComponent from './abstract-component.js';
+import {parseDate, parseTime} from '../utils/common.js';
 
 const getEditEvents = (card) => {
   return (
@@ -151,9 +152,10 @@ const getEditEvents = (card) => {
   );
 };
 
-export default class EditEvents {
+export default class EditEvents extends AbstractComponent {
   constructor(card) {
-    this._element = null;
+    super();
+
     this._card = card;
   }
 
@@ -161,15 +163,7 @@ export default class EditEvents {
     return getEditEvents(this._card);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }
