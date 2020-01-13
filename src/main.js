@@ -1,39 +1,70 @@
-import {createTripInfoTemplate} from './components/info.js';
-import {createTripControlsTemplate} from './components/controls.js';
-import {createTripFiltersTemplate} from './components/filters.js';
-import {createTripSortTemplate} from './components/sort.js';
-import {createAddTripEventsTemplate} from './components/add-events.js';
-import {createEditTripEventsTemplate} from './components/edit-events.js';
-import {createTripEventListTemplate} from './components/event-list.js';
-import {createTripEventsItem} from './components/events-item.js';
+import {RenderPosition, render} from './utils.js';
+import TripInfoComponent from './components/info.js';
+import CostComponent from './components/cost.js';
+import ControlsComponent from './components/controls.js';
+import FiltersComponent from './components/filters.js';
+import SortComponent from './components/sort.js';
+import EventsComponent from './components/event-item.js';
+import EditEventsComponent from './components/edit-event.js';
+import EventContainerComponent from './components/event-list.js';
+import DayComponent from './components/day.js';
+import {cards} from './mock/events.js';
+import {sortOptions} from './mock/sort.js';
+import {filters} from './mock/filters.js';
 
-const TRIP_COUNT = 3;
-
-const render = (container, template, place = `beforeEnd`) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
-
-render(tripInfo, createTripInfoTemplate(), `afterBegin`);
-
 const tripControls = tripMain.querySelector(`.trip-controls`);
-const tripControlsMenu = tripControls.querySelector(`h2:nth-of-type(1)`);
-const tripControlsFilters = tripControls.querySelector(`h2:nth-of-type(2)`);
+const tripEvents = document.querySelector(`.trip-events`);
 
-render(tripControlsMenu, createTripControlsTemplate(), `afterEnd`);
-render(tripControlsFilters, createTripFiltersTemplate(), `afterEnd`);
+render(tripInfo, new TripInfoComponent(cards).getElement(), RenderPosition.AFTERBEGIN);
+render(tripInfo, new CostComponent(cards).getElement(), RenderPosition.BEFOREEND);
+render(tripControls, new ControlsComponent().getElement(), RenderPosition.BEFOREEND);
+render(tripControls, new FiltersComponent(filters).getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new SortComponent(sortOptions).getElement(), RenderPosition.BEFOREEND);
+render(tripEvents, new EventContainerComponent().getElement(), RenderPosition.BEFOREEND);
 
-const tripEvets = document.querySelector(`.trip-events`);
+const tripDays = document.querySelector(`.trip-days`);
+const dates = [
+  ...new Set(cards.map((card) => new Date(card.startDate).toDateString()))
+];
 
-render(tripEvets, createTripSortTemplate());
-render(tripEvets, createAddTripEventsTemplate());
-render(tripEvets, createEditTripEventsTemplate());
-render(tripEvets, createTripEventListTemplate());
+dates.forEach((day, index) => {
+  render(tripDays, new DayComponent(day, index).getElement(), RenderPosition.BEFOREEND);
+  const dayContainer = tripDays.querySelector(`.trip-days__item:last-of-type`);
+  cards.filter((event) => day === new Date(event.startDate).toDateString())
+    .forEach((even) => {
+      const eventList = dayContainer.querySelector(`.trip-events__list`);
 
-const tripEventList = tripEvets.querySelector(`.trip-events__list`);
+      const onEscKeyDown = (evt) => {
+        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+        if (isEscKey) {
+          replaceEditToEvent();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
 
-for (let i = 0; i < TRIP_COUNT; i++) {
-  render(tripEventList, createTripEventsItem());
-}
+      const replaceEditToEvent = () => {
+        eventList.replaceChild(eventComponent.getElement(), editEventComponent.getElement());
+      };
+
+      const replaceEventToEdit = () => {
+        eventList.replaceChild(editEventComponent.getElement(), eventComponent.getElement());
+      };
+
+      const eventComponent = new EventsComponent(even);
+      const editButton = eventComponent.getElement().querySelector(`.event__rollup-btn`);
+      editButton.addEventListener(`click`, () => {
+        replaceEventToEdit();
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+
+      const editEventComponent = new EditEventsComponent(even);
+      editEventComponent.getElement().addEventListener(`submit`, () => replaceEditToEvent);
+
+      render(eventList, eventComponent.getElement(), RenderPosition.BEFOREEND);
+    }
+
+    );
+});
