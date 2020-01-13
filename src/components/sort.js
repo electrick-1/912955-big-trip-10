@@ -37,8 +37,6 @@ export default class Sort extends AbstractComponent {
 
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-
       if (evt.target.tagName.toLowerCase() !== `label`) {
         return;
       }
@@ -50,8 +48,6 @@ export default class Sort extends AbstractComponent {
       }
 
       this._currentSortType = sortType;
-      this.getElement().querySelectorAll(`.trip-sort__input`).forEach((it) => it.removeAttribute(`checked`, `checked`));
-      this.getElement().querySelector(`#sort-${this._currentSortType}`).setAttribute(`checked`, `checked`);
 
       handler(this._currentSortType);
     });
