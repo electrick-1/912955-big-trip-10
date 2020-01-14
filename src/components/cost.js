@@ -1,13 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 
 const getCost = (cards) => {
-  let cost = 0;
-  cards.forEach((card) => {
-    cost += card.price;
-    card.offers.forEach((offer) => {
-      cost += offer.price;
-    });
-  });
+  let cost = cards.reduce((sum, current) => sum + current.price, 0);
 
   return (
     `<p class="trip-info__cost">

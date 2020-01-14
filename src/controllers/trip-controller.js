@@ -1,6 +1,6 @@
 import {RenderPosition, replace, render} from '../utils/render.js';
 import TripInfoComponent from '../components/info.js';
-import SortComponent from '../components/sort.js';
+import SortComponent, {SortType} from '../components/sort.js';
 import EventsComponent from '../components/event-item.js';
 import EditEventsComponent from '../components/edit-event.js';
 import NoEventsComponent from '../components/no-events.js';
@@ -13,29 +13,32 @@ export default class TripController {
     this._container = container;
 
     this._noEventsComponent = new NoEventsComponent();
+    this._sortComponent = new SortComponent(sortOptions);
   }
 
   render(cards) {
     const container = this._container.getElement();
     if (cards.length === 0) {
-      const addEventButton = container.querySelector(`.trip-main__event-add-btn`);
+      const addEventButton = document.querySelector(`.trip-main__event-add-btn`);
       addEventButton.setAttribute(`disabled`, true);
       render(container, this._noEventsComponent, RenderPosition.BEFOREEND);
     } else {
-      render(container, new TripInfoComponent(cards), RenderPosition.AFTERBEGIN);
-      render(container, new SortComponent(sortOptions), RenderPosition.AFTERBEGIN);
+      const tripInfo = document.querySelector(`.trip-info`);
+      render(tripInfo, new TripInfoComponent(cards), RenderPosition.AFTERBEGIN);
+      render(container, this._sortComponent, RenderPosition.AFTERBEGIN);
 
-      const tripDays = document.querySelector(`.trip-days`);
       const dates = [
         ...new Set(cards.map((card) => new Date(card.startDate).toDateString()))
       ];
 
-      dates.forEach((day, index) => {
-        render(tripDays, new DayComponent(day, index), RenderPosition.BEFOREEND);
-        const dayContainer = tripDays.querySelector(`.trip-days__item:last-of-type`);
+      const renderCards = (cont, events) => {
+        dates.forEach((day, index) => {
+          render(container, new DayComponent(day, index), RenderPosition.BEFOREEND);
+          const dayContainer = container.querySelector(`.trip-days__item:last-of-type`);
 
-        cards.filter((event) => day === new Date(event.startDate).toDateString())
+          events.filter((event) => day === new Date(event.startDate).toDateString())
           .forEach((event) => {
+            const eventList = dayContainer.querySelector(`.trip-events__list`);
             const onEscKeyDown = (evt) => {
               const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
               if (isEscKey) {
@@ -43,8 +46,6 @@ export default class TripController {
                 document.removeEventListener(`keydown`, onEscKeyDown);
               }
             };
-
-            const eventList = dayContainer.querySelector(`.trip-events__list`);
 
             const replaceEditToEvent = () => {
               replace(eventComponent, editEventComponent);
@@ -66,6 +67,34 @@ export default class TripController {
 
             render(eventList, eventComponent, RenderPosition.BEFOREEND);
           });
+        });
+      };
+
+      renderCards(container, cards);
+
+      this._sortComponent.setSortTypeChangeHandler((sortType) => {
+        let sortedTasks = [];
+
+        switch (sortType) {
+          case SortType.TIME:
+            sortedTasks = cards.slice().sort((a, b) => (a.endDate - a.startDate) - (b.endDate - b.startDate));
+            break;
+          case SortType.PRICE:
+            sortedTasks = cards.slice().sort((a, b) => b.price - a.price);
+            break;
+          case SortType.EVENT:
+            sortedTasks = cards;
+            break;
+        }
+
+        container.innerHTML = ``;
+        render(container, this._sortComponent, RenderPosition.AFTERBEGIN);
+
+        if (sortType === SortType.EVENT) {
+          renderCards(container, cards);
+        } else {
+          renderCards(container, sortedTasks);
+        }
       });
     }
   }
