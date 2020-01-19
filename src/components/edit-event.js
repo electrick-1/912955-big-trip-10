@@ -1,4 +1,4 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 import {parseDate, parseTime} from '../utils/common.js';
 
 const getEditEvents = (card) => {
@@ -161,7 +161,7 @@ const getEditEvents = (card) => {
   );
 };
 
-export default class EditEvents extends AbstractComponent {
+export default class EditEvents extends AbstractSmartComponent {
   constructor(card) {
     super();
 
@@ -172,7 +172,19 @@ export default class EditEvents extends AbstractComponent {
     return getEditEvents(this._card);
   }
 
+  recoveryListeners() {
+
+  }
+
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+  }
+
+  setFavoritesClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
   }
 }
