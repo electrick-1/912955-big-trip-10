@@ -59,7 +59,7 @@ export default class TripController {
       ...new Set(cards.map((card) => new Date(card.startDate).toDateString()))
     ];
 
-    const newEvents = renderCards(this._container, dates, cards, this._onDataChange, this._onViewChange);
+    const newEvents = renderCards(container, dates, cards, this._onDataChange, this._onViewChange);
     this._showedEvents = this._showedEvents.concat(newEvents);
   }
 

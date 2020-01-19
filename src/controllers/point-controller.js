@@ -39,8 +39,14 @@ export default class PointController {
       }));
     });
 
-    this._editEventsComponent.setSubmitHandler(() => this._replaceEditToEvent());
-    this._editEventsComponent.setClickHandler(() => this._replaceEditToEvent());
+    this._editEventsComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      this._replaceEditToEvent();
+    });
+    this._editEventsComponent.setClickHandler((evt) => {
+      evt.preventDefault();
+      this._replaceEditToEvent();
+    });
 
     if (oldEventComponent && oldTaskEditComponent) {
       replace(this._eventsComponent, oldEventComponent);
@@ -59,17 +65,17 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
 
-    this._editEventsComponent.reset();
+    // this._editEventsComponent.reset();
 
     replace(this._eventsComponent, this._editEventsComponent);
-    this._mode = Mode.DEFAULT;
+    // this._mode = Mode.DEFAULT;
   }
 
   _replaceEventToEdit() {
-    this._onViewChange();
+    // this._onViewChange();
 
     replace(this._editEventsComponent, this._eventsComponent);
-    this._mode = Mode.EDIT;
+    // this._mode = Mode.EDIT;
   }
 
   _onEscKeyDown(evt) {
