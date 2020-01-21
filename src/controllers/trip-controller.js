@@ -25,11 +25,6 @@ const renderCards = (
       ? new DayComponent(date, index + 1)
       : new DayComponent();
 
-    if (day._date === undefined) {
-      day._date = ``;
-      day._index = ``;
-    }
-
     cards.filter((_card) => {
       return isDefaultSorting
         ? date === new Date(_card.startDate).toDateString()
