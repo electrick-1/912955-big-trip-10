@@ -1,4 +1,4 @@
-import {RenderPosition, replace, render} from '../utils/render.js';
+import {RenderPosition, replace, renderElement} from '../utils/render.js';
 import EventsComponent from '../components/event-item.js';
 import EditEventsComponent from '../components/edit-event.js';
 
@@ -52,7 +52,7 @@ export default class PointController {
       replace(this._eventsComponent, oldEventComponent);
       replace(this._editEventsComponent, oldEventComponent);
     } else {
-      render(this._container, this._eventsComponent, RenderPosition.BEFOREEND);
+      renderElement(this._container, this._eventsComponent, RenderPosition.BEFOREEND);
     }
   }
 

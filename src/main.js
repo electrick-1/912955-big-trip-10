@@ -1,4 +1,4 @@
-import {RenderPosition, render} from './utils/render.js';
+import {RenderPosition, renderElement} from './utils/render.js';
 import TripController from './controllers/trip-controller.js';
 import CostComponent from './components/cost.js';
 import ControlsComponent from './components/controls.js';
@@ -13,10 +13,10 @@ const tripControls = tripMain.querySelector(`.trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const eventContainerComponent = new EventContainerComponent();
 
-render(tripInfo, new CostComponent(cards), RenderPosition.BEFOREEND);
-render(tripControls, new ControlsComponent(), RenderPosition.BEFOREEND);
-render(tripControls, new FiltersComponent(filters), RenderPosition.BEFOREEND);
-render(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
+renderElement(tripInfo, new CostComponent(cards), RenderPosition.BEFOREEND);
+renderElement(tripControls, new ControlsComponent(), RenderPosition.BEFOREEND);
+renderElement(tripControls, new FiltersComponent(filters), RenderPosition.BEFOREEND);
+renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
 
 
 const tripController = new TripController(eventContainerComponent);
