@@ -1,14 +1,18 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {parseDate, parseTime} from '../utils/common.js';
+import {EventTypeToPlaceholderText} from '../const.js';
+import {getUpperFirstLetter, parseDate, parseTime} from '../utils/common.js';
 
-const getEditEvents = (card) => {
+const getEditEvents = (card, option) => {
+  const {city, photos, description, startDate, endDate, offers, price} = card;
+  const {type} = option;
+
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -75,9 +79,9 @@ const getEditEvents = (card) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            Sightseeing at
+            ${getUpperFirstLetter(type)} ${EventTypeToPlaceholderText[getUpperFirstLetter(type)]}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.city}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
@@ -90,12 +94,12 @@ const getEditEvents = (card) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${parseDate(card.startDate)} ${parseTime(card.startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${parseDate(startDate)} ${parseTime(startDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${parseDate(card.endDate)} ${parseTime(card.endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${parseDate(endDate)} ${parseTime(endDate)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -103,7 +107,7 @@ const getEditEvents = (card) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${card.price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -120,10 +124,10 @@ const getEditEvents = (card) => {
       </header>
       <section class="event__details">
 
-      ${card.offers.length > 0 ?
+      ${offers.length > 0 ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        ${card.offers
+        ${offers
           .map((offer) => {
             return (
               `<div class="event__available-offers">
@@ -143,11 +147,11 @@ const getEditEvents = (card) => {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${card.description}</p>
+          <p class="event__destination-description">${description}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-              ${card.photos
+              ${photos
                 .map((url) => {
                   return (
                     `<img class="event__photo" src="${url}" alt="Event photo">`
@@ -166,25 +170,43 @@ export default class EditEvents extends AbstractSmartComponent {
     super();
 
     this._card = card;
+    this._typeEvent = card.type;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return getEditEvents(this._card);
+    return getEditEvents(this._card, {type: this._typeEvent});
   }
 
   recoveryListeners() {
-
+    this.setClickHandler(this._clickHandler);
+    this.setFavoritesClickHandler(this._favoritesClickHandler);
+    this.setSubmitHandler(this._submitHandler);
+    this._subscribeOnEvents();
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
   }
 
   setClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._clickHandler = handler;
   }
 
   setFavoritesClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoritesClickHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement().querySelector(`.event__type-list`);
+
+    element.addEventListener(`change`, (evt) => {
+      this._typeEvent = evt.target.value;
+      this.rerender();
+    });
   }
 }

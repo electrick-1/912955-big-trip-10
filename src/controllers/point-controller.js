@@ -65,8 +65,6 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
 
-    // this._editEventsComponent.reset();
-
     replace(this._eventsComponent, this._editEventsComponent);
     this._mode = Mode.DEFAULT;
   }

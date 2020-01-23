@@ -15,6 +15,12 @@ const parseDate = (UTCTimestamp) => {
   );
 };
 
+const getUpperFirstLetter = (type) => {
+  return (
+    type[0].toUpperCase() + type.slice(1, type.length)
+  );
+};
+
 const parseTime = (UTCTimestamp) => {
   const date = new Date(UTCTimestamp);
   return (
@@ -22,4 +28,4 @@ const parseTime = (UTCTimestamp) => {
   );
 };
 
-export {getRandomIntegerNumber, getRandomArrayItem, parseDate, parseTime};
+export {getRandomIntegerNumber, getRandomArrayItem, getUpperFirstLetter, parseDate, parseTime};

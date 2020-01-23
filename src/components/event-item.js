@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component.js';
+import {EventTypeToPlaceholderText} from '../const.js';
 import {parseTime} from '../utils/common.js';
 
 const getEvents = (event) => {
@@ -8,7 +9,7 @@ const getEvents = (event) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${event.type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${event.type} to airport</h3>
+        <h3 class="event__title">${event.type} ${EventTypeToPlaceholderText[event.type]} ${event.city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
