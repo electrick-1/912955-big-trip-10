@@ -1,10 +1,18 @@
+import flatpickr from 'flatpickr';
+import moment from "moment";
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {EventTypeToPlaceholderText} from '../const.js';
-import {getUpperFirstLetter, parseDate, parseTime} from '../utils/common.js';
+import {getUpperFirstLetter} from '../utils/common.js';
+
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
 
 const getEditEvents = (card, option) => {
   const {city, photos, description, startDate, endDate, offers, price} = card;
   const {type} = option;
+
+  const start = moment(startDate).format(`DD/MM/YY HH:mm`);
+  const end = moment(endDate).format(`DD/MM/YY HH:mm`);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -94,12 +102,12 @@ const getEditEvents = (card, option) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${parseDate(startDate)} ${parseTime(startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${start}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${parseDate(endDate)} ${parseTime(endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${end}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -172,7 +180,13 @@ export default class EditEvents extends AbstractSmartComponent {
     this._card = card;
     this._typeEvent = card.type;
 
+    this._flatpickrStartDate = null;
+    this._flatpickrEndDate = null;
+    this._startDate = this.getElement().querySelector(`#event-start-time-1`);
+    this._endDate = this.getElement().querySelector(`#event-end-time-1`);
+
     this._subscribeOnEvents();
+    this._applyFlatpickr();
   }
 
   getTemplate() {
@@ -184,6 +198,12 @@ export default class EditEvents extends AbstractSmartComponent {
     this.setFavoritesClickHandler(this._favoritesClickHandler);
     this.setSubmitHandler(this._submitHandler);
     this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+
+    this._applyFlatpickr();
   }
 
   setSubmitHandler(handler) {
@@ -199,6 +219,36 @@ export default class EditEvents extends AbstractSmartComponent {
   setFavoritesClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
     this._favoritesClickHandler = handler;
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickrStartDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrStartDate = null;
+    }
+
+    if (this._flatpickrEndDate) {
+      this._flatpickrEndDate.destroy();
+      this._flatpickrEndDate = null;
+    }
+
+    this._flatpickrStartDate = flatpickr(this._startDate, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: this._card.startDate,
+      format: `d/m/Y H:i`,
+      altFormat: `d/m/Y H:i`,
+      enableTime: true
+    });
+
+    this._flatpickrEndDate = flatpickr(this._endDate, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: this._card.endDate,
+      format: `d/m/Y H:i`,
+      altFormat: `d/m/Y H:i`,
+      enableTime: true
+    });
   }
 
   _subscribeOnEvents() {
