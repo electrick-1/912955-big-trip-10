@@ -1,8 +1,18 @@
+import moment from "moment";
 import AbstractComponent from './abstract-component.js';
 import {EventTypeToPlaceholderText} from '../const.js';
-import {parseTime} from '../utils/common.js';
+import {formatDuration} from '../utils/common.js';
 
 const getEvents = (event) => {
+
+  const startDatetime = moment(event.startDate).format(`YYYY-MM-DDThh:mm:ss`);
+  const endDatetime = moment(event.endDate).format(`YYYY-MM-DDThh:mm:ss`);
+
+  const startTime = moment(event.startDate).format(`HH:mm`);
+  const endTime = moment(event.endDate).format(`HH:mm`);
+
+  const duration = formatDuration(event.endDate - event.startDate);
+
   return (
     `<li class="trip-events__item">
       <div class="event">
@@ -13,11 +23,11 @@ const getEvents = (event) => {
 
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${parseTime(event.startDate)}</time>
+            <time class="event__start-time" datetime="${startDatetime}">${startTime}</time>
             —
-            <time class="event__end-time" datetime="2019-03-18T11:00">${parseTime(event.endDate)}</time>
+            <time class="event__end-time" datetime="${endDatetime}">${endTime}</time>
           </p>
-          <p class="event__duration">1H 30M</p>
+          <p class="event__duration">${duration}</p>
         </div>
 
         <p class="event__price">
