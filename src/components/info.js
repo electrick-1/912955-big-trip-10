@@ -11,27 +11,27 @@ const getDuration = (startDateUTCTimestamp, endDateUTCTimestamp) => {
   return (`${monthName} ${startDay}&nbsp;&mdash;&nbsp;${endDay}`);
 };
 
-const getTripInfo = (cards) => {
+const getTripInfo = (points) => {
   return (
     `<div class="trip-info__main">
       <h1 class="trip-info__title">
-        ${cards[0].city}
-        ${cards.length > 2 ? `&mdash; ... &mdash;` : `&mdash;`}
-        ${cards[cards.length - 1].city}
+        ${points[0].city}
+        ${points.length > 2 ? `&mdash; ... &mdash;` : `&mdash;`}
+        ${points[points.length - 1].city}
       </h1>
-      <p class="trip-info__dates">${getDuration(cards[0].startDate, cards[cards.length - 1].endDate)}</p>
+      <p class="trip-info__dates">${getDuration(points[0].startDate, points[points.length - 1].endDate)}</p>
     </div>`
   );
 };
 
 export default class TripInfo extends AbstractComponent {
-  constructor(cards) {
+  constructor(points) {
     super();
 
-    this._cards = cards;
+    this._points = points;
   }
 
   getTemplate() {
-    return getTripInfo(this._cards);
+    return getTripInfo(this._points);
   }
 }

@@ -3,23 +3,22 @@ import AbstractComponent from './abstract-component.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {formatDuration} from '../utils/common.js';
 
-const getEvents = (event) => {
+const getEvents = (point) => {
+  const startDatetime = moment(point.startDate).format(`YYYY-MM-DDThh:mm:ss`);
+  const endDatetime = moment(point.endDate).format(`YYYY-MM-DDThh:mm:ss`);
 
-  const startDatetime = moment(event.startDate).format(`YYYY-MM-DDThh:mm:ss`);
-  const endDatetime = moment(event.endDate).format(`YYYY-MM-DDThh:mm:ss`);
+  const startTime = moment(point.startDate).format(`HH:mm`);
+  const endTime = moment(point.endDate).format(`HH:mm`);
 
-  const startTime = moment(event.startDate).format(`HH:mm`);
-  const endTime = moment(event.endDate).format(`HH:mm`);
-
-  const duration = formatDuration(event.endDate - event.startDate);
+  const duration = formatDuration(point.endDate - point.startDate);
 
   return (
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${event.type}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${point.type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${event.type} ${EventTypeToPlaceholderText[event.type]} ${event.city}</h3>
+        <h3 class="event__title">${point.type} ${EventTypeToPlaceholderText[point.type]} ${point.city}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
@@ -31,12 +30,12 @@ const getEvents = (event) => {
         </div>
 
         <p class="event__price">
-          €&nbsp;<span class="event__price-value">${event.price}</span>
+          €&nbsp;<span class="event__price-value">${point.price}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-        ${event.offers
+        ${point.offers
           .map((offer) => {
             return (`
               <li class="event__offer">
@@ -58,14 +57,14 @@ const getEvents = (event) => {
 };
 
 export default class Events extends AbstractComponent {
-  constructor(event) {
+  constructor(point) {
     super();
 
-    this._event = event;
+    this._point = point;
   }
 
   getTemplate() {
-    return getEvents(this._event);
+    return getEvents(this._point);
   }
 
   setClickHandler(handler) {

@@ -11,8 +11,7 @@ const Types = [
   `Sightseeing`,
   `Taxi`,
   `Train`,
-  `Transport`,
-  `Trip`
+  `Transport`
 ];
 
 const Cities = [
@@ -101,16 +100,17 @@ const generateEndDate = () => {
 };
 
 const generateOffers = () => {
-  let options = [];
+  let offers = [];
 
   for (let i = 0; i < getRandomIntegerNumber(0, 2); i++) {
-    options.push(getRandomArrayItem(Offers));
+    offers.push(getRandomArrayItem(Offers));
   }
-  return options;
+  return offers;
 };
 
 const generateCard = () => {
   return {
+    id: String(Date.now() + Math.random()),
     type: getRandomArrayItem(Types),
     city: getRandomArrayItem(Cities),
     photos: generatePhotos(),
@@ -118,7 +118,8 @@ const generateCard = () => {
     startDate: generateStartDate(),
     endDate: generateEndDate(),
     offers: generateOffers(),
-    price: getRandomIntegerNumber(50, 150)
+    price: getRandomIntegerNumber(50, 150),
+    isFavored: false
   };
 };
 

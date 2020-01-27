@@ -1,19 +1,21 @@
-import flatpickr from 'flatpickr';
 import moment from "moment";
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
+
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {getUpperFirstLetter} from '../utils/common.js';
 
-import 'flatpickr/dist/flatpickr.min.css';
-import 'flatpickr/dist/themes/light.css';
 
-const getEditEvents = (card, option) => {
-  const {city, photos, description, startDate, endDate, offers, price} = card;
+const getEditEvents = (point, option) => {
+  const {city, photos, description, startDate, endDate, offers, price, isFavorit} = point;
   const {type} = option;
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
 
+  const favorit = isFavorit ? `checked` : ``;
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
@@ -29,37 +31,37 @@ const getEditEvents = (card, option) => {
               <legend class="visually-hidden">Transfer</legend>
 
               <div class="event__type-item">
-                <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+                <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === `taxi` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+                <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${type === `bus` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+                <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${type === `train` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+                <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${type === `ship` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+                <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${type === `transport` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+                <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${type === `drive` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight"  ${type === `flight` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
               </div>
             </fieldset>
@@ -68,17 +70,17 @@ const getEditEvents = (card, option) => {
               <legend class="visually-hidden">Activity</legend>
 
               <div class="event__type-item">
-                <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+                <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${type === `check-in` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+                <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${type === `sightseeing` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+                <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${type === `restaurant` ? `checked` : ``}>
                 <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
               </div>
             </fieldset>
@@ -120,6 +122,7 @@ const getEditEvents = (card, option) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favorit}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -173,30 +176,67 @@ const getEditEvents = (card, option) => {
   );
 };
 
+const parseFormData = (formData, type) => {
+  return {
+    type,
+    city: formData.get(`event-destination`),
+    startDate: flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`),
+    endDate: flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`),
+    price: formData.get(`event-price`)
+  };
+};
+
 export default class EditEvents extends AbstractSmartComponent {
-  constructor(card) {
+  constructor(point) {
     super();
 
-    this._card = card;
-    this._typeEvent = card.type;
+    this._point = point;
+    this._typeEvent = point.type;
 
     this._flatpickrStartDate = null;
     this._flatpickrEndDate = null;
     this._startDate = this.getElement().querySelector(`#event-start-time-1`);
     this._endDate = this.getElement().querySelector(`#event-end-time-1`);
 
+    this._clickHandler = null;
+    this._submitHandler = null;
+    this._favoritesClickHandler = null;
+    this._deleteButtonClickHandler = null;
+
     this._subscribeOnEvents();
     this._applyFlatpickr();
   }
 
   getTemplate() {
-    return getEditEvents(this._card, {type: this._typeEvent});
+    return getEditEvents(this._point, {type: this._typeEvent});
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
+  removeElement() {
+    if (this._flatpickrStartDate) {
+      this._flatpickrStartDate.destroy();
+      this._flatpickrStartDate = null;
+    }
+
+    if (this._flatpickrEndDate) {
+      this._flatpickrEndDate.destroy();
+      this._flatpickrEndDate = null;
+    }
+
+    super.removeElement();
   }
 
   recoveryListeners() {
     this.setClickHandler(this._clickHandler);
-    this.setFavoritesClickHandler(this._favoritesClickHandler);
     this.setSubmitHandler(this._submitHandler);
+    this.setFavoritesClickHandler(this._favoritesClickHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -206,9 +246,11 @@ export default class EditEvents extends AbstractSmartComponent {
     this._applyFlatpickr();
   }
 
-  setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
-    this._submitHandler = handler;
+  reset() {
+    const point = this._point;
+    this._type = point.type;
+
+    this.rerender();
   }
 
   setClickHandler(handler) {
@@ -216,9 +258,19 @@ export default class EditEvents extends AbstractSmartComponent {
     this._clickHandler = handler;
   }
 
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
   setFavoritesClickHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
     this._favoritesClickHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = null;
   }
 
   _applyFlatpickr() {
@@ -235,16 +287,17 @@ export default class EditEvents extends AbstractSmartComponent {
     this._flatpickrStartDate = flatpickr(this._startDate, {
       altInput: true,
       allowInput: true,
-      defaultDate: this._card.startDate,
+      defaultDate: this._point.startDate,
       format: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
+      minDate: Date.now(),
       enableTime: true
     });
 
     this._flatpickrEndDate = flatpickr(this._endDate, {
       altInput: true,
       allowInput: true,
-      defaultDate: this._card.endDate,
+      defaultDate: this._point.endDate,
       format: `d/m/Y H:i`,
       altFormat: `d/m/Y H:i`,
       enableTime: true

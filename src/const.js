@@ -12,3 +12,9 @@ export const EventTypeToPlaceholderText = {
   'Sightseeing': `at`,
   'Restaurant': `at`
 };
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};

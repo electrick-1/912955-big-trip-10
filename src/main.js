@@ -1,11 +1,11 @@
 import {RenderPosition, renderElement} from './utils/render.js';
 import TripController from './controllers/trip-controller.js';
+import FilterController from './controllers/filter.js';
 import CostComponent from './components/cost.js';
 import ControlsComponent from './components/controls.js';
-import FiltersComponent from './components/filters.js';
 import EventContainerComponent from './components/event-list.js';
+import PointsModel from './models/points.js';
 import {cards} from './mock/events.js';
-import {filters} from './mock/filters.js';
 
 const tripMain = document.querySelector(`.trip-main`);
 const tripInfo = tripMain.querySelector(`.trip-info`);
@@ -15,10 +15,14 @@ const eventContainerComponent = new EventContainerComponent();
 
 renderElement(tripInfo, new CostComponent(cards), RenderPosition.BEFOREEND);
 renderElement(tripControls, new ControlsComponent(), RenderPosition.BEFOREEND);
-renderElement(tripControls, new FiltersComponent(filters), RenderPosition.BEFOREEND);
+const pointsModel = new PointsModel();
+const filterComponent = new FilterController(tripControls, pointsModel);
+filterComponent.render();
+
 renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
 
+pointsModel.setPoints(cards);
 
-const tripController = new TripController(eventContainerComponent);
+const tripController = new TripController(eventContainerComponent, pointsModel);
 
-tripController.render(cards);
+tripController.render();
