@@ -4,18 +4,24 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 
 import AbstractSmartComponent from './abstract-smart-component.js';
+import {EmptyPoint} from '../controllers/point-controller.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {getUpperFirstLetter} from '../utils/common.js';
 
 
 const getEditEvents = (point, option) => {
-  const {city, photos, description, startDate, endDate, offers, price, isFavorit} = point;
+  const {city, photos, description, startDate, endDate, offers, price, isFavorite} = point;
   const {type} = option;
+
+  let creatingPoint = false;
+
+  if (point === EmptyPoint) {
+    creatingPoint = true;
+  }
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
 
-  const favorit = isFavorit ? `checked` : ``;
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
@@ -104,8 +110,7 @@ const getEditEvents = (point, option) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${start}">
-          &mdash;
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${start}">&mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
@@ -121,17 +126,17 @@ const getEditEvents = (point, option) => {
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
-        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${favorit}>
-        <label class="event__favorite-btn" for="event-favorite-1">
+        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
+        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+        <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"></path>
           </svg>
         </label>
-        <button class="event__rollup-btn" type="button">
+        ${creatingPoint ? `` : `<button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
-        </button>
+        </button>`}
       </header>
       <section class="event__details">
 
@@ -215,17 +220,14 @@ export default class EditEvents extends AbstractSmartComponent {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    return parseFormData(formData);
+    return parseFormData(formData, this._typeEvent);
   }
 
   removeElement() {
-    if (this._flatpickrStartDate) {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
       this._flatpickrStartDate.destroy();
-      this._flatpickrStartDate = null;
-    }
-
-    if (this._flatpickrEndDate) {
       this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
       this._flatpickrEndDate = null;
     }
 
@@ -238,6 +240,7 @@ export default class EditEvents extends AbstractSmartComponent {
     this.setFavoritesClickHandler(this._favoritesClickHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
+    this._applyFlatpickr();
   }
 
   rerender() {
@@ -254,8 +257,11 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   setClickHandler(handler) {
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
-    this._clickHandler = handler;
+    const element = this.getElement().querySelector(`.event__rollup-btn`);
+    if (element) {
+      element.addEventListener(`click`, handler);
+      this._clickHandler = handler;
+    }
   }
 
   setSubmitHandler(handler) {
@@ -270,36 +276,29 @@ export default class EditEvents extends AbstractSmartComponent {
 
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
-    this._deleteButtonClickHandler = null;
+    this._deleteButtonClickHandler = handler;
   }
 
   _applyFlatpickr() {
-    if (this._flatpickrStartDate) {
+    if (this._flatpickrStartDate || this._flatpickrEndDate) {
       this._flatpickrStartDate.destroy();
-      this._flatpickrStartDate = null;
-    }
-
-    if (this._flatpickrEndDate) {
       this._flatpickrEndDate.destroy();
+      this._flatpickrStartDate = null;
       this._flatpickrEndDate = null;
     }
 
     this._flatpickrStartDate = flatpickr(this._startDate, {
-      altInput: true,
       allowInput: true,
       defaultDate: this._point.startDate,
-      format: `d/m/Y H:i`,
-      altFormat: `d/m/Y H:i`,
+      dateFormat: `d/m/Y H:i`,
       minDate: Date.now(),
       enableTime: true
     });
 
     this._flatpickrEndDate = flatpickr(this._endDate, {
-      altInput: true,
       allowInput: true,
       defaultDate: this._point.endDate,
-      format: `d/m/Y H:i`,
-      altFormat: `d/m/Y H:i`,
+      dateFormat: `d/m/Y H:i`,
       enableTime: true
     });
   }

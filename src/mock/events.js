@@ -119,7 +119,7 @@ const generateCard = () => {
     endDate: generateEndDate(),
     offers: generateOffers(),
     price: getRandomIntegerNumber(50, 150),
-    isFavored: false
+    isFavorite: false
   };
 };
 
@@ -128,11 +128,7 @@ const generateCards = (count) => {
   return new Array(count)
   .fill(``)
   .map(generateCard)
-  .sort((prev, next) => prev.startDate - next.startDate);
+  .sort((prev, next) => next.startDate - prev.startDate);
 };
 
-const cards = generateCards(10);
-
-const menuNames = [`Table`, `Stats`];
-
-export {cards, menuNames};
+export const cards = generateCards(10);

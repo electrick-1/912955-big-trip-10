@@ -18,7 +18,7 @@ export const EmptyPoint = {
   endDate: new Date(),
   offers: [],
   price: 0,
-  isFavored: false
+  isFavorite: false
 };
 
 export default class PointController {
@@ -56,8 +56,19 @@ export default class PointController {
 
     this._editEventsComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+      const data = this._editEventsComponent.getData();
+      this._onDataChange(this, point, Object.assign({}, point, data));
       this._replaceEditToEvent();
     });
+
+    this._editEventsComponent.setDeleteButtonClickHandler((evt) => {
+      evt.preventDefault();
+      if (this._mode === Mode.CREATING) {
+        this._onDataChange(this, EmptyPoint, null);
+      }
+      this.destroy();
+    });
+
     this._editEventsComponent.setClickHandler((evt) => {
       evt.preventDefault();
       this._replaceEditToEvent();
@@ -80,7 +91,7 @@ export default class PointController {
           remove(oldEditEventComponent);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        renderElement(this._container, this._editEventsComponent, RenderPosition.BEFOREEND);
+        renderElement(this._container, this._editEventsComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
@@ -100,8 +111,6 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
 
-    this._editEventsComponent.reset();
-
     replace(this._eventsComponent, this._editEventsComponent);
     this._mode = Mode.DEFAULT;
   }
@@ -117,7 +126,7 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
-      if (this._mode === Mode.ADDING) {
+      if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
       }
       this._replaceEditToEvent();

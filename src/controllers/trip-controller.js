@@ -63,6 +63,14 @@ export default class TripController {
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  hide() {
+    this._container.hide();
+  }
+
+  show() {
+    this._container.show();
+  }
+
   render() {
     const points = this._pointsModel.getPoints();
 
@@ -87,20 +95,19 @@ export default class TripController {
       return;
     }
 
-    this._onViewChange();
-
-    this._createPoint = new PointController(this._container, this._onDataChange, this._onViewChange);
+    this._createPoint = new PointController(this._container.getElement(), this._onDataChange, this._onViewChange);
     this._createPoint.render(EmptyPoint, PointControllerMode.CREATING);
+    this._onViewChange();
   }
 
   _removePoints() {
+    this._container.getElement().innerHTML = ``;
     this._showedControllers.forEach((pointController) => pointController.destroy);
     this._showedControllers = [];
   }
 
   _updatePoints() {
     this._removePoints();
-    this._container.getElement().innerHTML = ``;
     this._showedControllers = renderPoints(
         this._pointsModel.getPoints(),
         this._container,
@@ -110,14 +117,13 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-
     if (oldData === EmptyPoint) {
       this._createPoint = null;
       if (newData === null) {
         pointController.destroy();
         this._updatePoints();
       } else {
-        this._pointsModel.addPoint(newData);
+        this._pointsModel.addPoints(newData);
         pointController.render(newData, PointControllerMode.DEFAULT);
 
         const destroyedPoint = this._showedControllers.pop();
@@ -130,8 +136,7 @@ export default class TripController {
       this._pointsModel.removePoint(oldData.id);
       this._updatePoints();
     } else {
-      const isSuccess = this._pointsModel._updatePoints(oldData.id, newData);
-
+      const isSuccess = this._pointsModel.updatePoints(oldData.id, newData);
       if (isSuccess) {
         pointController.render(newData, PointControllerMode.DEFAULT);
         this._updatePoints();

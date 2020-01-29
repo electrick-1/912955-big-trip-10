@@ -8,9 +8,9 @@ export const EventTypeToPlaceholderText = {
   'Transport': `to`,
   'Drive': `to`,
   'Flight': `to`,
-  'Check-in': `at`,
-  'Sightseeing': `at`,
-  'Restaurant': `at`
+  'Check-in': `in`,
+  'Sightseeing': `in`,
+  'Restaurant': `in`
 };
 
 export const FilterType = {
