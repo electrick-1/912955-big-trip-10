@@ -13,7 +13,6 @@ const tripInfo = tripMain.querySelector(`.trip-info`);
 const tripControls = tripMain.querySelector(`.trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const eventContainerComponent = new EventContainerComponent();
-const statisticsComponent = new StatisticsComponent();
 const controlsComponent = new ControlsComponent();
 
 renderElement(tripInfo, new CostComponent(cards), RenderPosition.BEFOREEND);
@@ -22,12 +21,14 @@ const pointsModel = new PointsModel();
 const filterComponent = new FilterController(tripControls, pointsModel);
 filterComponent.render();
 
-renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
-renderElement(tripEvents, statisticsComponent, RenderPosition.BEFOREEND);
-
 pointsModel.setPoints(cards);
 
 const tripController = new TripController(eventContainerComponent, pointsModel);
+const statisticsComponent = new StatisticsComponent(pointsModel.getPoints());
+
+renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
+renderElement(tripEvents, statisticsComponent, RenderPosition.BEFOREEND);
+
 
 statisticsComponent.hide();
 
