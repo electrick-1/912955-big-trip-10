@@ -29,7 +29,6 @@ const statisticsComponent = new StatisticsComponent(pointsModel.getPoints());
 renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
 renderElement(tripEvents, statisticsComponent, RenderPosition.BEFOREEND);
 
-
 statisticsComponent.hide();
 
 tripController.render();

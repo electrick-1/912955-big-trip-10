@@ -287,7 +287,9 @@ export default class EditEvents extends AbstractSmartComponent {
       this._flatpickrEndDate = null;
     }
 
-    this._flatpickrStartDate = flatpickr(this._startDate, {
+    const element = this.getElement();
+
+    this._flatpickrStartDate = flatpickr(element.querySelector(`input[name="event-start-time"]`), {
       allowInput: true,
       defaultDate: this._point.startDate,
       dateFormat: `d/m/Y H:i`,
@@ -295,10 +297,11 @@ export default class EditEvents extends AbstractSmartComponent {
       enableTime: true
     });
 
-    this._flatpickrEndDate = flatpickr(this._endDate, {
+    this._flatpickrEndDate = flatpickr(element.querySelector(`input[name="event-end-time"]`), {
       allowInput: true,
       defaultDate: this._point.endDate,
       dateFormat: `d/m/Y H:i`,
+      minDate: Date.now(),
       enableTime: true
     });
   }
