@@ -1,7 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 
-const getCost = (cards) => {
-  let cost = cards.reduce((sum, current) => sum + current.price, 0);
+const getCost = (points) => {
+  let cost = points.reduce((sum, current) => sum + current.price, 0);
 
   return (
     `<p class="trip-info__cost">
@@ -11,13 +11,13 @@ const getCost = (cards) => {
 };
 
 export default class Cost extends AbstractComponent {
-  constructor(cards) {
+  constructor(points) {
     super();
 
-    this._cards = cards;
+    this._points = points;
   }
 
   getTemplate() {
-    return getCost(this._cards);
+    return getCost(this._points);
   }
 }

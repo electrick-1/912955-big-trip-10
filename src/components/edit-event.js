@@ -8,10 +8,14 @@ import {EmptyPoint} from '../controllers/point-controller.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {getUpperFirstLetter} from '../utils/common.js';
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
 
-const getEditEvents = (point, option) => {
-  const {city, photos, description, startDate, endDate, offers, price, isFavorite} = point;
-  const {type} = option;
+
+const getEditEvents = (point, destinations, offersModel) => {
+  const {type, city, description, photos, startDate, endDate, price, isFavorite, externalData} = point;
 
   let creatingPoint = false;
 
@@ -21,6 +25,9 @@ const getEditEvents = (point, option) => {
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -99,10 +106,7 @@ const getEditEvents = (point, option) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
-            <option value="Saint Petersburg"></option>
+            ${city}
           </datalist>
         </div>
 
@@ -125,8 +129,8 @@ const getEditEvents = (point, option) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
         <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
@@ -140,17 +144,17 @@ const getEditEvents = (point, option) => {
       </header>
       <section class="event__details">
 
-      ${offers.length > 0 ?
+      ${offersModel.length > 0 ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        ${offers
+        ${offersModel
           .map((offer) => {
             return (
               `<div class="event__available-offers">
                 <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-${offer.type}" type="checkbox" name="event-${offer.type}" checked>
-                  <label class="event__offer-label" for="event-${offer.type}">
-                    <span class="event__offer-title">${offer.name}</span>
+                  <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}" type="checkbox" name="event-${offer.title}" ${offer.isChecked ? `checked` : ``}>
+                  <label class="event__offer-label" for="event-${offer.title}">
+                    <span class="event__offer-title">${offer.title}</span>
                     &plus;
                     &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                   </label>
@@ -168,9 +172,9 @@ const getEditEvents = (point, option) => {
           <div class="event__photos-container">
             <div class="event__photos-tape">
               ${photos
-                .map((url) => {
+                .map((photo) => {
                   return (
-                    `<img class="event__photo" src="${url}" alt="Event photo">`
+                    `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`
                   );
                 })}
             </div>
@@ -192,10 +196,14 @@ const parseFormData = (formData, type) => {
 };
 
 export default class EditEvents extends AbstractSmartComponent {
-  constructor(point) {
+  constructor(point, destinationsModel, offersModel) {
     super();
 
     this._point = point;
+    this._city = point.city;
+    this._destinationsModel = destinationsModel;
+    this._destinations = destinationsModel.getObject();
+    this._offersModel = offersModel;
     this._typeEvent = point.type;
 
     this._flatpickrStartDate = null;
@@ -213,14 +221,19 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return getEditEvents(this._point, {type: this._typeEvent});
+    return getEditEvents(this._point, this._destinations, this._offersModel);
   }
 
   getData() {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    return parseFormData(formData, this._typeEvent);
+    return parseFormData(formData);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   removeElement() {

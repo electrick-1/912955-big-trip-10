@@ -1,56 +1,68 @@
+import API from './api.js';
+import Destinations from './models/destinations.js';
+import Offers from './models/offers.js';
+import PointsModel from './models/points.js';
 import {RenderPosition, renderElement} from './utils/render.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter.js';
-import CostComponent from './components/cost.js';
 import ControlsComponent, {ControlItem} from './components/controls.js';
 import EventContainerComponent from './components/event-list.js';
 import StatisticsComponent from './components/statistics.js';
-import PointsModel from './models/points.js';
-import {cards} from './mock/events.js';
+
+const AUTHORIZATION = `Basic YXNzd29yZAo345dXNBw`;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip/`;
+
+const api = new API(END_POINT, AUTHORIZATION);
+const pointsModel = new PointsModel();
+const destinationsModel = new Destinations();
+const offersModel = new Offers();
 
 const tripMain = document.querySelector(`.trip-main`);
-const tripInfo = tripMain.querySelector(`.trip-info`);
 const tripControls = tripMain.querySelector(`.trip-controls`);
 const tripEvents = document.querySelector(`.trip-events`);
 const eventContainerComponent = new EventContainerComponent();
 const controlsComponent = new ControlsComponent();
 
-renderElement(tripInfo, new CostComponent(cards), RenderPosition.BEFOREEND);
 renderElement(tripControls, controlsComponent, RenderPosition.BEFOREEND);
-const pointsModel = new PointsModel();
+renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
+
 const filterComponent = new FilterController(tripControls, pointsModel);
 filterComponent.render();
 
-pointsModel.setPoints(cards);
+api.getPoints()
+  .then((points) => pointsModel.setPoints(points))
+  .then(() => api.getDestinations()
+  .then((destinations) => destinationsModel.setDestinations(destinations)))
+  .then(() => api.getOffers()
+  .then((offers) => offersModel.setOffers(offers)))
+  .then(()=> {
+    const statisticsComponent = new StatisticsComponent(pointsModel.getPoints());
+    renderElement(tripEvents, statisticsComponent, RenderPosition.BEFOREEND);
+    statisticsComponent.hide();
 
-const tripController = new TripController(eventContainerComponent, pointsModel);
-const statisticsComponent = new StatisticsComponent(pointsModel.getPoints());
 
-renderElement(tripEvents, eventContainerComponent, RenderPosition.BEFOREEND);
-renderElement(tripEvents, statisticsComponent, RenderPosition.BEFOREEND);
+    const tripController = new TripController(eventContainerComponent, pointsModel, destinationsModel, offersModel, api);
+    tripController.render();
 
-statisticsComponent.hide();
+    document.querySelector(`.trip-main__event-add-btn`)
+      .addEventListener(`click`, () => {
+        tripController.createPoint();
+      });
 
-tripController.render();
-
-document.querySelector(`.trip-main__event-add-btn`)
-  .addEventListener(`click`, () => {
-    tripController.createPoint();
+    controlsComponent.setOnChange((controlItem) => {
+      switch (controlItem) {
+        case ControlItem.TABLE:
+          controlsComponent.setActiveItem(ControlItem.TABLE);
+          tripController._sortComponent.show();
+          tripController.show();
+          statisticsComponent.hide();
+          break;
+        case ControlItem.STATS:
+          controlsComponent.setActiveItem(ControlItem.STATS);
+          tripController._sortComponent.hide();
+          tripController.hide();
+          statisticsComponent.show();
+          break;
+      }
+    });
   });
-
-controlsComponent.setOnChange((controlItem) => {
-  switch (controlItem) {
-    case ControlItem.TABLE:
-      controlsComponent.setActiveItem(ControlItem.TABLE);
-      tripController._sortComponent.show();
-      tripController.show();
-      statisticsComponent.hide();
-      break;
-    case ControlItem.STATS:
-      controlsComponent.setActiveItem(ControlItem.STATS);
-      tripController._sortComponent.hide();
-      tripController.hide();
-      statisticsComponent.show();
-      break;
-  }
-});
