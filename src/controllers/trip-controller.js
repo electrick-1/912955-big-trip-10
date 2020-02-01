@@ -156,10 +156,10 @@ export default class TripController {
         .then(() => {
           pointController.destroy();
           this._updatePoints();
-        })
-        .catch(() => {
-          pointController.shake();
         });
+        // .catch(() => {
+        //   pointController.shake();
+        // });
       } else {
         this._api.createPoint(newData)
         .then((pointModel) => {
@@ -171,10 +171,10 @@ export default class TripController {
 
           this._showedControllers = [].concat(this._container, this._showedControllers);
           this._updatePoints();
-        })
-        .catch(() => {
-          pointController.shake();
         });
+        // .catch(() => {
+        //   pointController.shake();
+        // });
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -187,10 +187,10 @@ export default class TripController {
           pointController.render(pointModel, PointControllerMode.DEFAULT);
           this._updatePoints();
         }
-      })
-        .catch(() => {
-          pointController.shake();
-        });
+      });
+      // .catch(() => {
+      //   pointController.shake();
+      // });
     }
   }
 

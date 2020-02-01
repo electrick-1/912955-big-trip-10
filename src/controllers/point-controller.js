@@ -77,15 +77,15 @@ export default class PointController {
       this._replaceEditToEvent();
     });
 
-    this._editEventsComponent.setData({
-      saveButtonText: `Saving...`,
-    });
+    // this._editEventsComponent.setData({
+    //   saveButtonText: `Saving...`,
+    // });
 
     this._editEventsComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
-      this._editEventsComponent.setData({
-        deleteButtonText: `Deleting...`,
-      });
+      // this._editEventsComponent.setData({
+      //   deleteButtonText: `Deleting...`,
+      // });
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
       }
@@ -153,20 +153,20 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  shake() {
-    this._editEventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._eventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._editEventsComponent.getElement().style.animation = ``;
-      this._eventsComponent.getElement().style.animation = ``;
-
-      this._editEventsComponent.setData({
-        saveButtonText: `Save`,
-        deleteButtonText: `Delete`,
-      });
-    }, SHAKE_ANIMATION_TIMEOUT);
-  }
+  // shake() {
+  //   // this._editEventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  //   // this._eventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  //
+  //   setTimeout(() => {
+  //     this._editEventsComponent.getElement().style.animation = ``;
+  //     this._eventsComponent.getElement().style.animation = ``;
+  //
+  //     this._editEventsComponent.setData({
+  //       saveButtonText: `Save`,
+  //       deleteButtonText: `Delete`,
+  //     });
+  //   }, SHAKE_ANIMATION_TIMEOUT);
+  // }
 
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);

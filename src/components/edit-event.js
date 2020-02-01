@@ -8,14 +8,14 @@ import {EmptyPoint} from '../controllers/point-controller.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {getUpperFirstLetter} from '../utils/common.js';
 
-const DefaultData = {
-  deleteButtonText: `Delete`,
-  saveButtonText: `Save`,
-};
+// const DefaultData = {
+//   deleteButtonText: `Delete`,
+//   saveButtonText: `Save`,
+// };
 
 
 const getEditEvents = (point, destinations, offersModel) => {
-  const {type, city, description, photos, startDate, endDate, price, isFavorite, externalData} = point;
+  const {type, city, description, photos, startDate, endDate, price, isFavorite} = point;
 
   let creatingPoint = false;
 
@@ -25,9 +25,6 @@ const getEditEvents = (point, destinations, offersModel) => {
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
-
-  const deleteButtonText = externalData.deleteButtonText;
-  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -129,8 +126,8 @@ const getEditEvents = (point, destinations, offersModel) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
-        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
         <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
@@ -229,11 +226,6 @@ export default class EditEvents extends AbstractSmartComponent {
     const formData = new FormData(form);
 
     return parseFormData(formData);
-  }
-
-  setData(data) {
-    this._externalData = Object.assign({}, DefaultData, data);
-    this.rerender();
   }
 
   removeElement() {
