@@ -3,6 +3,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 
+import Store from '../models/store.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {EmptyPoint} from '../controllers/point-controller.js';
 import {EventTypeToPlaceholderText} from '../const.js';
@@ -13,11 +14,13 @@ import {getUpperFirstLetter} from '../utils/common.js';
 //   saveButtonText: `Save`,
 // };
 
-
-const getEditEvents = (point, destinations, offersModel) => {
-  const {type, city, description, photos, startDate, endDate, price, isFavorite} = point;
-
+const getEditEvents = (point, options) => {
+  const {startDate, endDate, price, isFavorite} = point;
+  const {type, city, description, offers, photos} = options;
   let creatingPoint = false;
+
+  const cities = Store.getDestinations().map((destination) => destination.name);
+  const cityTemplate = (cityArr) => cityArr.map((currCity) => `<option value=${currCity}></option>`);
 
   if (point === EmptyPoint) {
     creatingPoint = true;
@@ -103,7 +106,7 @@ const getEditEvents = (point, destinations, offersModel) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${city}
+            ${cityTemplate(cities)}
           </datalist>
         </div>
 
@@ -141,10 +144,10 @@ const getEditEvents = (point, destinations, offersModel) => {
       </header>
       <section class="event__details">
 
-      ${offersModel.length > 0 ?
+      ${offers.length > 0 ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        ${offersModel
+        ${offers
           .map((offer) => {
             return (
               `<div class="event__available-offers">
@@ -155,28 +158,29 @@ const getEditEvents = (point, destinations, offersModel) => {
                     &plus;
                     &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                   </label>
-                </div>`
+                </div>
+              </div>`
             );
-          })
-        .join(` `)}
-        </div>
+          }).join(` `)}
       </section>` : ` `}
 
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
+      ${description.length > 0 ?
+      `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${description}</p>
+        ${photos.length > 0 ?
+      `<div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${photos
+            .map((photo) => {
+              return (
+                `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`
+              );
+            })}
+        </div>
+      </div>` : ` `}
 
-          <div class="event__photos-container">
-            <div class="event__photos-tape">
-              ${photos
-                .map((photo) => {
-                  return (
-                    `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`
-                  );
-                })}
-            </div>
-          </div>
-        </section>
+      </section>` : ` `}
       </section>
     </form>`
   );
@@ -193,15 +197,18 @@ const parseFormData = (formData, type) => {
 };
 
 export default class EditEvents extends AbstractSmartComponent {
-  constructor(point, destinationsModel, offersModel) {
+  constructor(point) {
     super();
 
     this._point = point;
-    this._city = point.city;
-    this._destinationsModel = destinationsModel;
-    this._destinations = destinationsModel.getObject();
-    this._offersModel = offersModel;
+    this._cityEvent = point.city;
     this._typeEvent = point.type;
+
+    this._offers = [...point.offers];
+    this._photos = [...point.photos];
+
+    this._price = point.price;
+    this._description = point.description;
 
     this._flatpickrStartDate = null;
     this._flatpickrEndDate = null;
@@ -218,7 +225,7 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return getEditEvents(this._point, this._destinations, this._offersModel);
+    return getEditEvents(this._point, {type: this._typeEvent, city: this._cityEvent, description: this._description, offers: this._offers, photos: this._photos});
   }
 
   getData() {
@@ -257,6 +264,7 @@ export default class EditEvents extends AbstractSmartComponent {
   reset() {
     const point = this._point;
     this._type = point.type;
+    this._city = point.city;
 
     this.rerender();
   }
@@ -312,11 +320,30 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-    const element = this.getElement().querySelector(`.event__type-list`);
+    const typeList = this.getElement().querySelector(`.event__type-list`);
+    const dataList = this.getElement().querySelector(`.event__input--destination`);
 
-    element.addEventListener(`change`, (evt) => {
-      this._typeEvent = evt.target.value;
-      this.rerender();
+    typeList.addEventListener(`change`, (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        this._typeEvent = evt.target.value;
+        this._offers = Store.getOffers().find(
+            (offer) => offer.type === this._typeEvent
+        ).offers;
+        this.rerender();
+      }
+    });
+
+    dataList.addEventListener(`change`, (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        this._cityEvent = evt.target.value;
+        this._photos = Store.getDestinations().find(
+            (destination) => destination.name === this._cityEvent
+        ).pictures;
+        this._description = Store.getDestinations().find(
+            (destination) => destination.name === this._cityEvent
+        ).description;
+        this.rerender();
+      }
     });
   }
 }

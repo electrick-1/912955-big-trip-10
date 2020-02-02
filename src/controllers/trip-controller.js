@@ -32,8 +32,6 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 const renderPoints = (
     points,
     container,
-    destinationsModel,
-    offersModel,
     onDataChange,
     onViewChange,
     isDefaultSorting = true
@@ -56,8 +54,6 @@ const renderPoints = (
     .forEach((point) => {
       const pointController = new PointController(
           day.getElement().querySelector(`.trip-events__list`),
-          destinationsModel,
-          offersModel,
           onDataChange,
           onViewChange
       );
@@ -70,11 +66,9 @@ const renderPoints = (
 };
 
 export default class TripController {
-  constructor(container, pointsModel, destinationsModel, offersModel, api) {
+  constructor(container, pointsModel, api) {
     this._container = container;
     this._pointsModel = pointsModel;
-    this._destinationsModel = destinationsModel;
-    this._offersModel = offersModel;
     this._api = api;
 
     this._showedControllers = [];
@@ -109,8 +103,6 @@ export default class TripController {
     this._showedControllers = renderPoints(
         points,
         this._container,
-        this._destinationsModel,
-        this._offersModel,
         this._onDataChange,
         this._onViewChange
     );
@@ -125,7 +117,7 @@ export default class TripController {
       return;
     }
 
-    this._createPoint = new PointController(this._container.getElement(), this._destinationsModel, this._offersModel, this._onDataChange, this._onViewChange);
+    this._createPoint = new PointController(this._container.getElement(), this._onDataChange, this._onViewChange);
     this._createPoint.render(EmptyPoint, PointControllerMode.CREATING);
     this._onViewChange();
   }
@@ -141,8 +133,6 @@ export default class TripController {
     this._showedControllers = renderPoints(
         this._pointsModel.getPoints(),
         this._container,
-        this._destinationsModel,
-        this._offersModel,
         this._onDataChange,
         this._onViewChange
     );

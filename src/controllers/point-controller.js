@@ -3,7 +3,7 @@ import EventsComponent from '../components/event-item.js';
 import EditEventsComponent from '../components/edit-event.js';
 import PointModel from '../models/point';
 
-const SHAKE_ANIMATION_TIMEOUT = 600;
+// const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const Mode = {
   CREATING: `creating`,
@@ -25,12 +25,10 @@ export const EmptyPoint = {
 };
 
 export default class PointController {
-  constructor(container, destinationsModel, offersModel, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
-    this._destinationsModel = destinationsModel;
-    this._offersModel = offersModel;
 
     this._mode = Mode.DEFAULT;
 
@@ -54,7 +52,7 @@ export default class PointController {
     this._pointData = point;
     this._newPointData = this._pointData;
     this._eventsComponent = new EventsComponent(this._pointData);
-    this._editEventsComponent = new EditEventsComponent(this._pointData, this._destinationsModel, this._offersModel);
+    this._editEventsComponent = new EditEventsComponent(this._pointData);
 
     this._eventsComponent.setClickHandler(() => {
       this._replaceEventToEdit();

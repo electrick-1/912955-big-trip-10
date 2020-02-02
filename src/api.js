@@ -1,6 +1,5 @@
 import Point from './models/point.js';
-import Destinations from './models/destinations.js';
-import Offers from './models/offers.js';
+import Store from './models/store.js';
 
 const Method = {
   GET: `GET`,
@@ -32,13 +31,13 @@ export default class API {
   getDestinations() {
     return this._load({url: `destinations`})
       .then((response) => response.json())
-      .then(Destinations.parseDestinations);
+      .then(Store.setDestinations);
   }
 
   getOffers() {
     return this._load({url: `offers`})
       .then((response) => response.json())
-      .then(Offers.parseOffers);
+      .then(Store.setOffers);
   }
 
   createPoint(point) {
@@ -70,7 +69,7 @@ export default class API {
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 
-    return fetch(`${this._endPoint}/${url}`, {method, body, headers})
+    return fetch(`${this._endPoint}${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
         throw err;
