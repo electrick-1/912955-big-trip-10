@@ -30,8 +30,6 @@ const getEditEvents = (point, options) => {
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
 
-  console.log(isFavorite)
-
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">

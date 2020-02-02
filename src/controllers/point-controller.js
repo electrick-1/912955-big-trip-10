@@ -35,7 +35,6 @@ const parseFormData = (formData) => {
   );
 
   return new PointModel({
-    'is_favorite': formData.get(`event-favorite`) ? true : false,
     'base_price': Number(formData.get(`event-price`)),
     'date_from': new Date(
         moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`).valueOf()
@@ -49,6 +48,7 @@ const parseFormData = (formData) => {
       'pictures': destination.pictures
     },
     'id': `0`,
+    'is_favorite': formData.get(`event-favorite`) ? true : false,
     'offers': selectedOffers.map((offer) => ({
       'title': offer.querySelector(`.event-offer-title`).textContent,
       'price': Number(offer.querySelector(`.event-offer-price`).textContent)
