@@ -1,7 +1,9 @@
+import moment from "moment";
 import {RenderPosition, replace, remove, renderElement} from '../utils/render.js';
 import EventsComponent from '../components/event-item.js';
 import EditEventsComponent from '../components/edit-event.js';
 import PointModel from '../models/point';
+import Store from '../models/store.js';
 
 // const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -22,6 +24,37 @@ export const EmptyPoint = {
   offers: [],
   price: 0,
   isFavorite: false
+};
+
+const parseFormData = (formData) => {
+  const selectedOffers = [
+    ...document.querySelectorAll(`.event__offer-checkbox:checked + label[for^="event-offer"]`)
+  ];
+  const destination = Store.getDestinations().find(
+      (city) => city.name === formData.get(`event-destination`)
+  );
+
+  return new PointModel({
+    'is_favorite': formData.get(`event-favorite`) ? true : false,
+    'base_price': Number(formData.get(`event-price`)),
+    'date_from': new Date(
+        moment(formData.get(`event-start-time`), `DD/MM/YYYY HH:mm`).valueOf()
+    ).toISOString(),
+    'date_to': new Date(
+        moment(formData.get(`event-end-time`), `DD/MM/YYYY HH:mm`).valueOf()
+    ).toISOString(),
+    'destination': {
+      'description': destination.description,
+      'name': destination.name,
+      'pictures': destination.pictures
+    },
+    'id': `0`,
+    'offers': selectedOffers.map((offer) => ({
+      'title': offer.querySelector(`.event-offer-title`).textContent,
+      'price': Number(offer.querySelector(`.event-offer-price`).textContent)
+    })),
+    'type': formData.get(`event-type`)
+  });
 };
 
 export default class PointController {
@@ -67,9 +100,8 @@ export default class PointController {
 
     this._editEventsComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._updatePointData();
       const formData = this._editEventsComponent.getData();
-      const data = this._parseFormData(formData);
+      const data = parseFormData(formData);
 
       this._onDataChange(this, point, data);
       this._replaceEditToEvent();
@@ -115,28 +147,6 @@ export default class PointController {
         renderElement(this._container, this._editEventsComponent, RenderPosition.AFTERBEGIN);
         break;
     }
-  }
-
-  _parseFormData() {
-    return new PointModel({
-      'id': this._pointData.id,
-      'type': this._newPointData.type,
-      'is_favourite': this._pointData.isFavorite,
-      'base_price': this._newPointData.price,
-      'date_from': this._newPointData.startDate,
-      'date_to': this._newPointData.endDate,
-      'destination': {
-        'name': this._newPointData.city,
-        'description': ` `,
-        'pictures': []},
-      'offers': []
-    });
-  }
-
-  _updatePointData() {
-    this._newPointData.type = this._newCurrentType !== null ? this._newCurrentType : this._pointData.type;
-    this._newPointData.start = this._newStartDate !== null ? new Date(this._newStartDate) : this._pointData.start;
-    this._newPointData.end = this._newEndDate !== null ? new Date(this._newEndDate) : this._pointData.end;
   }
 
   setDefaultView() {

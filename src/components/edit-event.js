@@ -20,6 +20,7 @@ const getEditEvents = (point, options) => {
   let creatingPoint = false;
 
   const cities = Store.getDestinations().map((destination) => destination.name);
+
   const cityTemplate = (cityArr) => cityArr.map((currCity) => `<option value=${currCity}></option>`);
 
   if (point === EmptyPoint) {
@@ -28,6 +29,8 @@ const getEditEvents = (point, options) => {
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
+
+  console.log(isFavorite)
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -131,7 +134,7 @@ const getEditEvents = (point, options) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
-        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite && `checked`}>
         <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -186,16 +189,6 @@ const getEditEvents = (point, options) => {
   );
 };
 
-const parseFormData = (formData, type) => {
-  return {
-    type,
-    city: formData.get(`event-destination`),
-    startDate: flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`),
-    endDate: flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`),
-    price: formData.get(`event-price`)
-  };
-};
-
 export default class EditEvents extends AbstractSmartComponent {
   constructor(point) {
     super();
@@ -230,9 +223,7 @@ export default class EditEvents extends AbstractSmartComponent {
 
   getData() {
     const form = this.getElement();
-    const formData = new FormData(form);
-
-    return parseFormData(formData);
+    return new FormData(form);
   }
 
   removeElement() {
@@ -306,7 +297,7 @@ export default class EditEvents extends AbstractSmartComponent {
       allowInput: true,
       defaultDate: this._point.startDate,
       dateFormat: `d/m/Y H:i`,
-      minDate: Date.now(),
+      minDate: this._point.startDate,
       enableTime: true
     });
 
@@ -314,7 +305,7 @@ export default class EditEvents extends AbstractSmartComponent {
       allowInput: true,
       defaultDate: this._point.endDate,
       dateFormat: `d/m/Y H:i`,
-      minDate: Date.now(),
+      minDate: this._point.startDate,
       enableTime: true
     });
   }

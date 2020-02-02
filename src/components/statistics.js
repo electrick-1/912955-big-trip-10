@@ -144,7 +144,6 @@ const getStatistics = () => {
 export default class Statistics extends AbstractSmartComponent {
   constructor(pointsModel) {
     super();
-
     this._pointsModel = pointsModel;
 
     this._moneyChart = null;
@@ -169,7 +168,7 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._moneyChart = renderChart(
         moneyCtx,
-        generateChartData(`MONEY`, this._pointsModel),
+        generateChartData(`MONEY`, this._pointsModel.getPoints()),
         LabelName.EURO,
         LegendName.MONEY,
         true
@@ -177,14 +176,14 @@ export default class Statistics extends AbstractSmartComponent {
 
     this._transportChart = renderChart(
         transportCtx,
-        generateChartData(`TRANSPORT`, this._pointsModel),
+        generateChartData(`TRANSPORT`, this._pointsModel.getPoints()),
         LabelName.PIECES,
         LegendName.TRANSPORT
     );
 
     this._timeChart = renderChart(
         timeCtx,
-        generateChartData(`TIME-SPENT`, this._pointsModel),
+        generateChartData(`TIME-SPENT`, this._pointsModel.getPoints()),
         LabelName.HOURS,
         LegendName.TIME
     );
