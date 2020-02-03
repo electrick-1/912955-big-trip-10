@@ -146,14 +146,14 @@ export default class TripController {
         .then(() => {
           pointController.destroy();
           this._updatePoints();
+        })
+        .catch(() => {
+          pointController.shake();
         });
-        // .catch(() => {
-        //   pointController.shake();
-        // });
       } else {
         this._api.createPoint(newData)
         .then((pointModel) => {
-          this._pointsModel.addPoints(pointModel);
+          this._pointsModel.addPoint(pointModel);
           pointController.render(pointModel, PointControllerMode.DEFAULT);
 
           const destroyedPoint = this._showedControllers.pop();
@@ -161,26 +161,34 @@ export default class TripController {
 
           this._showedControllers = [].concat(this._container, this._showedControllers);
           this._updatePoints();
+          pointController.render(pointModel, PointControllerMode.DEFAULT);
+        })
+        .catch(() => {
+          pointController.shake();
         });
-        // .catch(() => {
-        //   pointController.shake();
-        // });
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._updatePoints();
+      this._api.deletePoint(oldData.id)
+        .then((pointModel) => {
+          this._pointsModel.removePoint(oldData.id);
+          this._updatePoints();
+          pointController.render(pointModel, PointControllerMode.DEFAULT);
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     } else {
       this._api.updatePoint(oldData.id, newData)
       .then((pointModel) => {
-        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
+        const isSuccess = this._pointsModel.updatePoints(oldData.id, pointModel);
         if (isSuccess) {
-          pointController.render(pointModel, PointControllerMode.DEFAULT);
           this._updatePoints();
+          pointController.render(pointModel, PointControllerMode.DEFAULT);
         }
+      })
+      .catch(() => {
+        pointController.shake();
       });
-      // .catch(() => {
-      //   pointController.shake();
-      // });
     }
   }
 

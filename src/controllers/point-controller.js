@@ -5,7 +5,7 @@ import EditEventsComponent from '../components/edit-event.js';
 import PointModel from '../models/point';
 import Store from '../models/store.js';
 
-// const SHAKE_ANIMATION_TIMEOUT = 600;
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const Mode = {
   CREATING: `creating`,
@@ -28,7 +28,7 @@ export const EmptyPoint = {
 
 const parseFormData = (formData) => {
   const selectedOffers = [
-    ...document.querySelectorAll(`.event__offer-checkbox:checked + label[for^="event-offer"]`)
+    ...document.querySelectorAll(`.event__offer-checkbox:checked + label`)
   ];
   const destination = Store.getDestinations().find(
       (city) => city.name === formData.get(`event-destination`)
@@ -66,7 +66,6 @@ export default class PointController {
     this._mode = Mode.DEFAULT;
 
     this._pointData = {};
-    this._newPointData = {};
     this._newCurrentType = null;
     this._newStartDate = null;
     this._newEndDate = null;
@@ -83,7 +82,6 @@ export default class PointController {
     this._mode = mode;
 
     this._pointData = point;
-    this._newPointData = this._pointData;
     this._eventsComponent = new EventsComponent(this._pointData);
     this._editEventsComponent = new EditEventsComponent(this._pointData);
 
@@ -102,23 +100,29 @@ export default class PointController {
       evt.preventDefault();
       const formData = this._editEventsComponent.getData();
       const data = parseFormData(formData);
+      this._editEventsComponent.disableForm();
+      console.log(data);
+      this._editEventsComponent.setData({
+        saveButtonText: `Saving...`,
+      });
 
       this._onDataChange(this, point, data);
+      this._editEventsComponent.activeForm();
       this._replaceEditToEvent();
+
     });
 
-    // this._editEventsComponent.setData({
-    //   saveButtonText: `Saving...`,
-    // });
 
     this._editEventsComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
-      // this._editEventsComponent.setData({
-      //   deleteButtonText: `Deleting...`,
-      // });
+      this._editEventsComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+      this._editEventsComponent.disableForm();
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
       }
+      this._editEventsComponent.activeForm();
       this.destroy();
     });
 
@@ -161,20 +165,20 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  // shake() {
-  //   // this._editEventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-  //   // this._eventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-  //
-  //   setTimeout(() => {
-  //     this._editEventsComponent.getElement().style.animation = ``;
-  //     this._eventsComponent.getElement().style.animation = ``;
-  //
-  //     this._editEventsComponent.setData({
-  //       saveButtonText: `Save`,
-  //       deleteButtonText: `Delete`,
-  //     });
-  //   }, SHAKE_ANIMATION_TIMEOUT);
-  // }
+  shake() {
+    this._editEventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._eventsComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._editEventsComponent.getElement().style.animation = ``;
+      this._eventsComponent.getElement().style.animation = ``;
+
+      this._editEventsComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);

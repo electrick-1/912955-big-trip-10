@@ -9,14 +9,14 @@ import {EmptyPoint} from '../controllers/point-controller.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {getUpperFirstLetter} from '../utils/common.js';
 
-// const DefaultData = {
-//   deleteButtonText: `Delete`,
-//   saveButtonText: `Save`,
-// };
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`
+};
 
 const getEditEvents = (point, options) => {
   const {startDate, endDate, price, isFavorite} = point;
-  const {type, city, description, offers, photos} = options;
+  const {type, city, description, offers, photos, externalData} = options;
   let creatingPoint = false;
 
   const cities = Store.getDestinations().map((destination) => destination.name);
@@ -29,6 +29,9 @@ const getEditEvents = (point, options) => {
 
   const start = moment(startDate).format(`DD/MM/YY HH:mm`);
   const end = moment(endDate).format(`DD/MM/YY HH:mm`);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -130,9 +133,9 @@ const getEditEvents = (point, options) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${creatingPoint ? `Cancel` : `Delete`}</button>
-        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite && `checked`}>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
+        <input id="event-favorite-1" class="event__favorite-checkbox js-event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn ${creatingPoint ? `visually-hidden` : ``}" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -177,7 +180,7 @@ const getEditEvents = (point, options) => {
               return (
                 `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`
               );
-            })}
+            }).join(``)}
         </div>
       </div>` : ` `}
 
@@ -201,6 +204,7 @@ export default class EditEvents extends AbstractSmartComponent {
     this._price = point.price;
     this._description = point.description;
 
+    this._externalData = DefaultData;
     this._flatpickrStartDate = null;
     this._flatpickrEndDate = null;
     this._startDate = this.getElement().querySelector(`#event-start-time-1`);
@@ -216,7 +220,8 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return getEditEvents(this._point, {type: this._typeEvent, city: this._cityEvent, description: this._description, offers: this._offers, photos: this._photos});
+    return getEditEvents(this._point, {type: this._typeEvent, city: this._cityEvent, description: this._description, offers: this._offers, photos: this._photos,
+      externalData: this._externalData});
   }
 
   getData() {
@@ -258,6 +263,11 @@ export default class EditEvents extends AbstractSmartComponent {
     this.rerender();
   }
 
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
+  }
+
   setClickHandler(handler) {
     const element = this.getElement().querySelector(`.event__rollup-btn`);
     if (element) {
@@ -279,6 +289,22 @@ export default class EditEvents extends AbstractSmartComponent {
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
     this._deleteButtonClickHandler = handler;
+  }
+
+  disableForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elm) => {
+      elm.readOnly = true;
+    });
+  }
+
+  activeForm() {
+    const form = this.getElement();
+    const elements = Array.from(form.elements);
+    elements.forEach((elm) => {
+      elm.readOnly = false;
+    });
   }
 
   _applyFlatpickr() {

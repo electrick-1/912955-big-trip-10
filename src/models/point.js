@@ -25,7 +25,7 @@ export default class Point {
       'date_to': this.endDate.toISOString(),
       'base_price': this.price,
       'offers': this.offers,
-      'is_favorite': this.isFavored,
+      'is_favorite': this.isFavorite,
     };
   }
 

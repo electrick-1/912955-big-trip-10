@@ -34,7 +34,6 @@ Promise.all([
 ]).then((res) => {
   pointsModel.setPoints(res[2]);
   tripController.render();
-  console.log(res[2][0])
 });
 
 const statisticsComponent = new StatisticsComponent(pointsModel);
