@@ -3,6 +3,8 @@ import AbstractComponent from './abstract-component.js';
 import {EventTypeToPlaceholderText} from '../const.js';
 import {formatDuration, getUpperFirstLetter} from '../utils/common.js';
 
+const SHOWED_OFFERS = 3;
+
 const getEvents = (point) => {
   const startDatetime = moment(point.startDate).format(`YYYY-MM-DDThh:mm:ss`);
   const endDatetime = moment(point.endDate).format(`YYYY-MM-DDThh:mm:ss`);
@@ -35,7 +37,7 @@ const getEvents = (point) => {
 
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-        ${point.offers
+        ${point.offers.slice(0, SHOWED_OFFERS)
           .map((offer) => {
             return (`
               <li class="event__offer">

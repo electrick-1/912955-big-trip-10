@@ -146,26 +146,28 @@ const getEditEvents = (point, options) => {
           <span class="visually-hidden">Open event</span>
         </button>`}
       </header>
-      <section class="event__details">
+
+      ${offers.length > 0 || description.length > 0 ?
+      `<section class="event__details">
 
       ${offers.length > 0 ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
         ${offers
           .map((offer) => {
             return (
-              `<div class="event__available-offers">
-                <div class="event__offer-selector">
+              `<div class="event__offer-selector">
                   <input class="event__offer-checkbox  visually-hidden" id="event-${offer.title}" type="checkbox" name="event-${offer.title}" ${offer.isChecked ? `checked` : ``}>
                   <label class="event__offer-label" for="event-${offer.title}">
                     <span class="event__offer-title">${offer.title}</span>
                     &plus;
                     &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                   </label>
-                </div>
-              </div>`
+                </div>`
             );
           }).join(` `)}
+          </div>
       </section>` : ` `}
 
       ${description.length > 0 ?
@@ -185,7 +187,7 @@ const getEditEvents = (point, options) => {
       </div>` : ` `}
 
       </section>` : ` `}
-      </section>
+      </section>` : ` `}
     </form>`
   );
 };

@@ -28,7 +28,7 @@ export const EmptyPoint = {
 
 const parseFormData = (formData) => {
   const selectedOffers = [
-    ...document.querySelectorAll(`.event__offer-checkbox:checked + label`)
+    ...document.querySelectorAll(`.event__offer-checkbox:checked + label[for^="event"]`)
   ];
   const destination = Store.getDestinations().find(
       (city) => city.name === formData.get(`event-destination`)

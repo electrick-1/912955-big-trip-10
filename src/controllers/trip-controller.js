@@ -65,6 +65,20 @@ const renderPoints = (
   return pointControllers;
 };
 
+const getTotalPrice = (points) => {
+  let cost = points.reduce((sum, point) => {
+    return sum + point.price + point.offers.reduce((offerCost, it) => {
+      return offerCost + it.price;
+    }, 0);
+  }, 0);
+
+  return (
+    `<p class="trip-info__cost">
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${cost}</span>
+    </p>`
+  );
+};
+
 export default class TripController {
   constructor(container, pointsModel, api) {
     this._container = container;
@@ -82,6 +96,7 @@ export default class TripController {
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+    this._totalPrice = null;
   }
 
   hide() {
@@ -90,6 +105,10 @@ export default class TripController {
 
   show() {
     this._container.show();
+  }
+
+  getTotalPrice() {
+    return this._totalPrice;
   }
 
   render() {
@@ -107,7 +126,7 @@ export default class TripController {
         this._onViewChange
     );
 
-    renderElement(tripInfo, new CostComponent(points), RenderPosition.BEFOREEND);
+    renderElement(tripInfo, new CostComponent(points), RenderPosition.AFTERBEGIN);
     renderElement(tripInfo, new TripInfoComponent(points), RenderPosition.AFTERBEGIN);
     renderElement(tripEvents, this._sortComponent, RenderPosition.AFTERBEGIN);
   }
@@ -136,6 +155,7 @@ export default class TripController {
         this._onDataChange,
         this._onViewChange
     );
+    this._totalPrice = getTotalPrice(this._pointModel);
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -154,14 +174,9 @@ export default class TripController {
         this._api.createPoint(newData)
         .then((pointModel) => {
           this._pointsModel.addPoint(pointModel);
-          pointController.render(pointModel, PointControllerMode.DEFAULT);
-
-          const destroyedPoint = this._showedControllers.pop();
-          destroyedPoint.destroy();
 
           this._showedControllers = [].concat(this._container, this._showedControllers);
           this._updatePoints();
-          pointController.render(pointModel, PointControllerMode.DEFAULT);
         })
         .catch(() => {
           pointController.shake();
@@ -169,10 +184,9 @@ export default class TripController {
       }
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
-        .then((pointModel) => {
+        .then(() => {
           this._pointsModel.removePoint(oldData.id);
           this._updatePoints();
-          pointController.render(pointModel, PointControllerMode.DEFAULT);
         })
         .catch(() => {
           pointController.shake();
@@ -183,7 +197,6 @@ export default class TripController {
         const isSuccess = this._pointsModel.updatePoints(oldData.id, pointModel);
         if (isSuccess) {
           this._updatePoints();
-          pointController.render(pointModel, PointControllerMode.DEFAULT);
         }
       })
       .catch(() => {
@@ -225,5 +238,6 @@ export default class TripController {
   }
   _onFilterChange() {
     this._updatePoints();
+    this._createPoint = null;
   }
 }
