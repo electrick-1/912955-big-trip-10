@@ -66,9 +66,6 @@ export default class PointController {
     this._mode = Mode.DEFAULT;
 
     this._pointData = {};
-    this._newCurrentType = null;
-    this._newStartDate = null;
-    this._newEndDate = null;
 
     this._eventsComponent = null;
     this._editEventsComponent = null;
@@ -108,8 +105,6 @@ export default class PointController {
 
       this._onDataChange(this, point, data);
       this._editEventsComponent.activeForm();
-      this._replaceEditToEvent();
-
     });
 
 
@@ -183,7 +178,10 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
 
-    replace(this._eventsComponent, this._editEventsComponent);
+    if (document.contains(this._editEventsComponent.getElement())) {
+      replace(this._eventsComponent, this._editEventsComponent);
+    }
+
     this._mode = Mode.DEFAULT;
   }
 
@@ -200,8 +198,9 @@ export default class PointController {
     if (isEscKey) {
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
+      } else {
+        this._replaceEditToEvent();
       }
-      this._replaceEditToEvent();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }

@@ -14,6 +14,14 @@ export default class FilterController {
     this._onDataChange = this._onDataChange.bind(this);
   }
 
+  show() {
+    this._filterComponent.show();
+  }
+
+  hide() {
+    this._filterComponent.hide();
+  }
+
   render() {
     const container = this._container;
     const filters = Object.values(FilterType).map((filterType) => {

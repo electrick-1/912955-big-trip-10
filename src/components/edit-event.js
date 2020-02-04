@@ -21,7 +21,7 @@ const getEditEvents = (point, options) => {
 
   const cities = Store.getDestinations().map((destination) => destination.name);
 
-  const cityTemplate = (cityArr) => cityArr.map((currCity) => `<option value=${currCity}></option>`);
+  const cityTemplate = (cityArr) => cityArr.map((currCity) => `<option value=${currCity} ${currCity === city ? `selected` : ``}>${currCity}</option>`);
 
   if (point === EmptyPoint) {
     creatingPoint = true;
@@ -108,10 +108,11 @@ const getEditEvents = (point, options) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${getUpperFirstLetter(type)} ${EventTypeToPlaceholderText[getUpperFirstLetter(type)]}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+          <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${cityTemplate(cities)}
           </datalist>
+          </select>
         </div>
 
         <div class="event__field-group  event__field-group--time">

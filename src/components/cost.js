@@ -1,28 +1,25 @@
 import AbstractComponent from './abstract-component.js';
 
-const getCost = (points) => {
-
-  let cost = points.reduce((sum, point) => {
-    return sum + point.price + point.offers.reduce((offerCost, it) => {
-      return offerCost + it.price;
-    }, 0);
-  }, 0);
-
+const getCost = () => {
   return (
     `<p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">${cost}</span>
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">0</span>
     </p>`
   );
 };
 
 export default class Cost extends AbstractComponent {
-  constructor(points) {
+  constructor() {
     super();
 
-    this._points = points;
+    this._cost = this.getElement().querySelector(`.trip-info__cost-value`);
   }
 
   getTemplate() {
-    return getCost(this._points);
+    return getCost();
+  }
+
+  setTotalPrice(cost) {
+    this._cost.textContent = cost;
   }
 }

@@ -1,32 +1,26 @@
 import AbstractComponent from './abstract-component.js';
 
-const getDuration = (startDateUTCTimestamp, endDateUTCTimestamp) => {
-  const startDate = new Date(startDateUTCTimestamp);
-  const endDate = new Date(endDateUTCTimestamp);
-  const monthNameStart = startDate.toLocaleString(`en-US`, {
-    month: `short`
-  });
-  const monthNameEnd = endDate.toLocaleString(`en-US`, {
-    month: `short`
-  });
-  const startDay = startDate.getDate();
-  const endDay = endDate.getDate();
-
-  if (monthNameStart === monthNameEnd) {
-    return (`${monthNameStart} ${startDay}&nbsp;&mdash;&nbsp;${endDay}`);
-  } else {
-    return (`${monthNameStart} ${startDay}&nbsp;&mdash;&nbsp;${monthNameEnd} ${endDay}`);
-  }
+const TRIP_LENGTH = {
+  ZERO: 0,
+  ONE: 1,
+  TWO: 2,
+  THREE: 3
 };
 
 const getCities = (points) => {
   let pointsLength = 0;
   switch (points.length) {
-    case 2:
+    case TRIP_LENGTH.ZERO:
+      pointsLength = ``;
+      break;
+    case TRIP_LENGTH.ONE:
+      pointsLength = `${points[0].city}`;
+      break;
+    case TRIP_LENGTH.TWO:
       pointsLength = `${points[0].city} &nbsp;&mdash;&nbsp; ${points[points.length - 1].city}`;
       break;
-    case 3:
-      pointsLength = `${points[0].city} &nbsp;&mdash;&nbsp; ${points[1].city} &nbsp;&mdash;&nbsp; ${points[points.length - 1].city}`;
+    case TRIP_LENGTH.THREE:
+      pointsLength = `${points[0].city} &nbsp; &mdash; &nbsp; ${points[1].city} &nbsp; &mdash; &nbsp; ${points[points.length - 1].city}`;
       break;
     default:
       pointsLength = `${points[0].city} &mdash; ... &mdash; ${points[points.length - 1].city}`;
@@ -35,25 +29,35 @@ const getCities = (points) => {
   return pointsLength;
 };
 
-const getTripInfo = (points) => {
+const getTripInfo = () => {
   return (
     `<div class="trip-info__main">
-      <h1 class="trip-info__title">
-        ${getCities(points)};
-      </h1>
-      <p class="trip-info__dates">${getDuration(points[0].startDate, points[points.length - 1].endDate)}</p>
+      <h1 class="trip-info__title"></h1>
+      <p class="trip-info__dates"></p>
     </div>`
   );
 };
 
 export default class TripInfo extends AbstractComponent {
-  constructor(points) {
+  constructor() {
     super();
 
-    this._points = points;
+    this._tripTitle = this.getElement().querySelector(`.trip-info__title`);
+    this._tripDates = this.getElement().querySelector(`.trip-info__dates`);
   }
 
   getTemplate() {
-    return getTripInfo(this._points);
+    return getTripInfo();
+  }
+
+  setTripInfo(points) {
+    this._tripTitle.textContent = getCities(points);
+    if (points.length === 0) {
+      this._tripDates.textContent = ``;
+    } else if (points.length === 1) {
+      this._tripDates.textContent = (new Date(points[0].startDate)).toDateString().substr(4, 6);
+    } else {
+      this._tripDates.textContent = (new Date(points[0].startDate)).toDateString().substr(4, 6) + ` - ` + (new Date(points[points.length - 1].endDate)).toDateString().substr(4, 6);
+    }
   }
 }

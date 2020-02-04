@@ -1,10 +1,9 @@
 import {RenderPosition, renderElement} from '../utils/render.js';
-import CostComponent from '../components/cost.js';
-import TripInfoComponent from '../components/info.js';
 import SortComponent, {SortType} from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 import NoEventsComponent from '../components/no-events.js';
+import EventContainerComponent from '../components/event-list.js';
 
 const sortOptions = [
   {
@@ -26,9 +25,6 @@ const sortOptions = [
   },
 ];
 
-const tripEvents = document.querySelector(`.trip-events`);
-const tripInfo = document.querySelector(`.trip-main__trip-info`);
-
 const renderPoints = (
     points,
     container,
@@ -36,7 +32,7 @@ const renderPoints = (
     onViewChange,
     isDefaultSorting = true
 ) => {
-  const pointControllers = [];
+  let pointControllers = [];
   const dates = isDefaultSorting
     ? [...new Set(points.map((point) => new Date(point.startDate).toDateString()))]
     : [true];
@@ -66,17 +62,11 @@ const renderPoints = (
 };
 
 const getTotalPrice = (points) => {
-  let cost = points.reduce((sum, point) => {
+  return points.reduce((sum, point) => {
     return sum + point.price + point.offers.reduce((offerCost, it) => {
       return offerCost + it.price;
     }, 0);
   }, 0);
-
-  return (
-    `<p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">${cost}</span>
-    </p>`
-  );
 };
 
 export default class TripController {
@@ -88,15 +78,19 @@ export default class TripController {
     this._showedControllers = [];
     this._sortComponent = new SortComponent(sortOptions);
     this._noEventsComponent = new NoEventsComponent();
+    this._eventContainerComponent = new EventContainerComponent();
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._pointDateChangeHandler = this._pointDateChangeHandler.bind(this);
 
-    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
     this._totalPrice = null;
+
+    this._priceChangeHandlers = [];
+    this._routeChangeHandlers = [];
   }
 
   hide() {
@@ -107,17 +101,37 @@ export default class TripController {
     this._container.show();
   }
 
+  setPriceChangeHandler(handler) {
+    this._priceChangeHandlers.push(handler);
+  }
+
+  setRouteChangeHandler(handler) {
+    this._routeChangeHandlers.push(handler);
+  }
+
   getTotalPrice() {
     return this._totalPrice;
   }
 
+  getPoints() {
+    return this._pointModel.getPoints();
+  }
+
+  onNewEventClick() {
+    this._onViewChange();
+  }
+
   render() {
     const points = this._pointsModel.getPoints();
-
+    this._pointsModel.setDataChangeHandler(this._pointDateChangeHandler);
     if (points.length === 0) {
       renderElement(this._container.getElement(), this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
+
+    renderElement(this._container.getElement(), this._sortComponent, RenderPosition.BEFOREEND);
+    renderElement(this._container.getElement(), this._eventContainerComponent, RenderPosition.BEFOREEND);
+    this._totalPrice = getTotalPrice(points);
 
     this._showedControllers = renderPoints(
         points,
@@ -125,11 +139,7 @@ export default class TripController {
         this._onDataChange,
         this._onViewChange
     );
-
-    // this._totalPrice = getTotalPrice(points);
-    renderElement(tripInfo, new CostComponent(points), RenderPosition.AFTERBEGIN);
-    renderElement(tripInfo, new TripInfoComponent(points), RenderPosition.AFTERBEGIN);
-    renderElement(tripEvents, this._sortComponent, RenderPosition.AFTERBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
   createPoint() {
@@ -156,7 +166,9 @@ export default class TripController {
         this._onDataChange,
         this._onViewChange
     );
-    this._totalPrice = getTotalPrice(this._pointModel.getPoints());
+    this._totalPrice = getTotalPrice(this._pointModel);
+    this._callHandlers(this._priceChangeHandlers);
+    this._callHandlers(this._routeChangeHandlers);
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -228,7 +240,7 @@ export default class TripController {
         break;
     }
 
-    this._container.getElement().innerHTML = ``;
+    this._removePoints();
     this._showedControllers = renderPoints(
         sortedCards,
         this._container,
@@ -236,10 +248,18 @@ export default class TripController {
         this._onViewChange,
         isDefaultSorting
     );
-    this._totalPrice = getTotalPrice(sortedCards);
   }
+
   _onFilterChange() {
     this._updatePoints();
     this._createPoint = null;
+  }
+
+  _pointDateChangeHandler() {
+    this._updateCards();
+  }
+
+  _callHandlers(handlers) {
+    handlers.forEach((handler) => handler());
   }
 }
