@@ -1,7 +1,12 @@
 import AbstractComponent from './abstract-component.js';
 
 const getCost = (points) => {
-  let cost = points.reduce((sum, current) => sum + current.price, 0);
+
+  let cost = points.reduce((sum, point) => {
+    return sum + point.price + point.offers.reduce((offerCost, it) => {
+      return offerCost + it.price;
+    }, 0);
+  }, 0);
 
   return (
     `<p class="trip-info__cost">

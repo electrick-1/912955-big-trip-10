@@ -101,7 +101,7 @@ export default class PointController {
       const formData = this._editEventsComponent.getData();
       const data = parseFormData(formData);
       this._editEventsComponent.disableForm();
-      console.log(data);
+
       this._editEventsComponent.setData({
         saveButtonText: `Saving...`,
       });
@@ -175,7 +175,7 @@ export default class PointController {
 
       this._editEventsComponent.setData({
         saveButtonText: `Save`,
-        deleteButtonText: `Delete`,
+        deleteButtonText: `Delete`
       });
     }, SHAKE_ANIMATION_TIMEOUT);
   }

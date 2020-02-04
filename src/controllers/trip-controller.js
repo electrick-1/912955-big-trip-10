@@ -126,6 +126,7 @@ export default class TripController {
         this._onViewChange
     );
 
+    // this._totalPrice = getTotalPrice(points);
     renderElement(tripInfo, new CostComponent(points), RenderPosition.AFTERBEGIN);
     renderElement(tripInfo, new TripInfoComponent(points), RenderPosition.AFTERBEGIN);
     renderElement(tripEvents, this._sortComponent, RenderPosition.AFTERBEGIN);
@@ -155,7 +156,7 @@ export default class TripController {
         this._onDataChange,
         this._onViewChange
     );
-    this._totalPrice = getTotalPrice(this._pointModel);
+    this._totalPrice = getTotalPrice(this._pointModel.getPoints());
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -175,7 +176,7 @@ export default class TripController {
         .then((pointModel) => {
           this._pointsModel.addPoint(pointModel);
 
-          this._showedControllers = [].concat(this._container, this._showedControllers);
+          this._showedControllers = [].concat(pointController, this._showedControllers);
           this._updatePoints();
         })
         .catch(() => {
@@ -235,6 +236,7 @@ export default class TripController {
         this._onViewChange,
         isDefaultSorting
     );
+    this._totalPrice = getTotalPrice(sortedCards);
   }
   _onFilterChange() {
     this._updatePoints();
