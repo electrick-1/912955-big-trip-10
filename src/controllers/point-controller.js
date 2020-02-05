@@ -51,8 +51,8 @@ const parseFormData = (formData) => {
     'id': `0`,
     'is_favorite': formData.get(`event-favorite`) ? true : false,
     'offers': selectedOffers.map((offer) => ({
-      'title': offer.querySelector(`.event-offer-title`).textContent,
-      'price': Number(offer.querySelector(`.event-offer-price`).textContent)
+      'title': offer.querySelector(`.event__offer-title`).textContent,
+      'price': Number(offer.querySelector(`.event__offer-price`).textContent)
     })),
     'type': formData.get(`event-type`)
   });
