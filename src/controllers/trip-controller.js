@@ -179,14 +179,8 @@ export default class TripController {
     if (oldData === EmptyPoint) {
       this._createPoint = null;
       if (newData === null) {
-        this._api.deletePoint(oldData.id)
-        .then(() => {
-          pointController.destroy();
-          this._updatePoints();
-        })
-        .catch(() => {
-          pointController.shake();
-        });
+        pointController.destroy();
+        this._updatePoints();
       } else {
         this._api.createPoint(newData)
         .then((pointModel) => {
@@ -260,7 +254,7 @@ export default class TripController {
   }
 
   _pointDateChangeHandler() {
-    this._updateCards();
+    this._updatePoints();
   }
 
   _callHandlers(handlers) {
