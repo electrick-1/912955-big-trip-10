@@ -118,7 +118,7 @@ export default class TripController {
   }
 
   getPoints() {
-    return this._pointModel.getPoints();
+    return this._pointsModel.getPoints();
   }
 
   onNewEventClick() {
