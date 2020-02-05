@@ -30,6 +30,7 @@ const parseFormData = (formData) => {
   const selectedOffers = [
     ...document.querySelectorAll(`.event__offer-checkbox:checked + label[for^="event"]`)
   ];
+
   const destination = Store.getDestinations().find(
       (city) => city.name === formData.get(`event-destination`)
   );
@@ -117,8 +118,8 @@ export default class PointController {
       if (this._mode === Mode.CREATING) {
         this._onDataChange(this, EmptyPoint, null);
       }
+      this._onDataChange(this, point, null);
       this._editEventsComponent.activeForm();
-      this.destroy();
     });
 
     this._editEventsComponent.setClickHandler((evt) => {

@@ -25,6 +25,8 @@ const sortOptions = [
   },
 ];
 
+const tripEvents = document.querySelector(`.trip-events`);
+
 const renderPoints = (
     points,
     container,
@@ -95,10 +97,12 @@ export default class TripController {
 
   hide() {
     this._container.hide();
+    this._sortComponent.hide();
   }
 
   show() {
     this._container.show();
+    this._sortComponent.show();
   }
 
   setPriceChangeHandler(handler) {
@@ -129,7 +133,7 @@ export default class TripController {
       return;
     }
 
-    renderElement(this._container.getElement(), this._sortComponent, RenderPosition.BEFOREEND);
+    renderElement(tripEvents, this._sortComponent, RenderPosition.BEFOREEND);
     renderElement(this._container.getElement(), this._eventContainerComponent, RenderPosition.BEFOREEND);
     this._totalPrice = getTotalPrice(points);
 
@@ -166,7 +170,7 @@ export default class TripController {
         this._onDataChange,
         this._onViewChange
     );
-    this._totalPrice = getTotalPrice(this._pointModel);
+    this._totalPrice = getTotalPrice(this._pointsModel.getPoints());
     this._callHandlers(this._priceChangeHandlers);
     this._callHandlers(this._routeChangeHandlers);
   }

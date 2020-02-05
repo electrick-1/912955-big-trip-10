@@ -14,16 +14,16 @@ const getCities = (points) => {
       pointsLength = ``;
       break;
     case TRIP_LENGTH.ONE:
-      pointsLength = `${points[0].city}`;
+      pointsLength = points[0].city;
       break;
     case TRIP_LENGTH.TWO:
-      pointsLength = `${points[0].city} &nbsp;&mdash;&nbsp; ${points[points.length - 1].city}`;
+      pointsLength = points[0].city + `\u00A0\u2013\u00A0` + points[points.length - 1].city;
       break;
     case TRIP_LENGTH.THREE:
-      pointsLength = `${points[0].city} &nbsp; &mdash; &nbsp; ${points[1].city} &nbsp; &mdash; &nbsp; ${points[points.length - 1].city}`;
+      pointsLength = points[0].city + `\u00A0\u2013\u00A0` + points[1].city + `\u00A0\u2013\u00A0` + points[points.length - 1].city;
       break;
     default:
-      pointsLength = `${points[0].city} &mdash; ... &mdash; ${points[points.length - 1].city}`;
+      pointsLength = points[0].city + `\u00A0\u2013\u00A0...\u00A0\u2013\u00A0` + points[points.length - 1].city;
       break;
   }
   return pointsLength;

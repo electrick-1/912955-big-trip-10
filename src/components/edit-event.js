@@ -223,8 +223,7 @@ export default class EditEvents extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return getEditEvents(this._point, {type: this._typeEvent, city: this._cityEvent, description: this._description, offers: this._offers, photos: this._photos,
-      externalData: this._externalData});
+    return getEditEvents(this._point, {type: this._typeEvent, city: this._cityEvent, description: this._description, offers: this._offers, photos: this._photos, externalData: this._externalData});
   }
 
   getData() {
@@ -352,7 +351,7 @@ export default class EditEvents extends AbstractSmartComponent {
     });
 
     dataList.addEventListener(`change`, (evt) => {
-      if (evt.target.tagName === `INPUT`) {
+      if (evt.target.tagName === `SELECT`) {
         this._cityEvent = evt.target.value;
         this._photos = Store.getDestinations().find(
             (destination) => destination.name === this._cityEvent

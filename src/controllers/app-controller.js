@@ -2,7 +2,7 @@ import API from '../api.js';
 import {renderElement, RenderPosition} from '../utils/render.js';
 import PointsModel from '../models/points.js';
 import TripController from './trip-controller.js';
-import FilterController from './filter.js';
+import FilterController from './filter-controller.js';
 import ControlsComponent, {ControlItem} from '../components/controls.js';
 import StatisticsComponent from '../components/statistics.js';
 import EventContainerComponent from '../components/event-list.js';
@@ -34,7 +34,7 @@ export default class AppController {
     const siteMainElement = document.querySelector(`.page-main`);
     const mainElementContainer = siteMainElement.querySelector(`.page-body__container`);
     const siteHeaderControls = document.querySelector(`.trip-controls`);
-    const filterController = new FilterController(siteHeaderControls, this._pointsModel);
+    this._filterController = new FilterController(siteHeaderControls, this._pointsModel);
     const tripRoute = document.querySelector(`.trip-info`);
 
     this._setEventAddBtn();
@@ -52,7 +52,7 @@ export default class AppController {
         this._pointsModel.setPoints(points);
         renderElement(tripRoute, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
         this._tripInfoComponent.setTripInfo(points);
-        filterController.render();
+        this._filterController.render();
         renderElement(tripRoute, this._costComponent, RenderPosition.BEFOREEND);
         this._tripController.render();
         this._costComponent.setTotalPrice(this._tripController.getTotalPrice());
@@ -73,12 +73,14 @@ export default class AppController {
         case ControlItem.STATS:
           this._controlsComponent.setActiveItem(ControlItem.STATS);
           this._tripController.hide();
+          this._filterController.hide();
           this._statisticsComponent.show();
           break;
         case ControlItem.TABLE:
           this._controlsComponent.setActiveItem(ControlItem.TABLE);
-          this._statisticsComponent.hide();
           this._tripController.show();
+          this._filterController.show();
+          this._statisticsComponent.hide();
           break;
       }
     });
